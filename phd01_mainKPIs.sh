@@ -55,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-# $run_sql_alfred $domain_wd/sql/$etl.sql
+$run_sql_alfred $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -94,7 +94,7 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-# $transpose $domain_wd/csv/$kpi_adoption_report.csv 
+$transpose $domain_wd/csv/$kpi_adoption_report.csv 
 
 # ====================================================================================================== ========== 4
 #  4  #
