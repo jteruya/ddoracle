@@ -26,6 +26,8 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 # Report fields
 kpi_adoption_report="KPI_Robin_AdoptionReport"
 kpi_sessionbucketing_report="KPI_Alfred_SessionBucketing"
+kpi_sessiondurations_report="KPI_Alfred_SessionDurations"
+kpi_appdurations_report="KPI_Alfred_AppDurations"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -53,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-$run_sql_alfred $domain_wd/sql/$etl.sql
+# $run_sql_alfred $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -83,6 +85,8 @@ echo "--------------------------------------------------------------------------
 
 $run_sql_robin $domain_wd/sql/$kpi_adoption_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_adoption_report.csv 
 $run_sql_alfred $domain_wd/sql/$kpi_sessionbucketing_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionbucketing_report.csv 
+$run_sql_alfred $domain_wd/sql/$kpi_sessiondurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessiondurations_report.csv 
+$run_sql_alfred $domain_wd/sql/$kpi_appdurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_appdurations_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -90,7 +94,7 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-$transpose $domain_wd/csv/$kpi_adoption_report.csv 
+# $transpose $domain_wd/csv/$kpi_adoption_report.csv 
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -105,13 +109,13 @@ $transpose $domain_wd/csv/$kpi_adoption_report.csv
 # ====================================================================================================== ========== 5 
 #  5  #
 # === #
-# echo "-------------------------------------------------------------------------------------------------"
-# echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain_formal) : " `date` 
-# echo "-------------------------------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------------------------------"
+echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
+echo "-------------------------------------------------------------------------------------------------"
 
-# sudo cp -rf $kpi_domain_wd/index.html /var/www/html/product/dashboards/social/index.html
-# sudo cp -rf $kpi_domain_wd/js/* /var/www/html/product/dashboards/social/js
-# sudo cp -rf $kpi_domain_wd/image/* /var/www/html/product/dashboards/social/image
-# sudo cp -rf $kpi_domain_wd/csv/* /var/www/html/product/dashboards/social/csv
+sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -

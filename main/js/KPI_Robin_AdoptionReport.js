@@ -33,7 +33,7 @@ adoption_options = {
   },
   xAxis: {
     title: {
-      title: ''
+      text: ''
     },
     type: 'datetime',
     dateTimeLabelFormats: {
