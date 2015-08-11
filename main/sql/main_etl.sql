@@ -14,3 +14,17 @@ WHERE Application_Id IN (SELECT ApplicationId AS ApplicationId FROM kevin.Users_
 
 CREATE INDEX ndx_sessionstartends_applicationid_userid_yyyymm ON dashboard.Session_StartEnds (ApplicationId, UserId, YYYY_MM);
 CREATE INDEX ndx_sessionstartends_applicationid_userid_ts ON dashboard.Session_StartEnds (ApplicationId, UserId, TS);
+
+--Identify the Durations per Each Session
+DROP TABLE IF EXISTS kevin.KPI_SessionDurations;
+CREATE TABLE kevin.KPI_SessionDurations AS
+SELECT ApplicationId, UserId, TS_Type, TS, NEXT_TS,
+CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN NEXT_TS - TS  END AS Duration,
+CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN CAST(EXTRACT(EPOCH FROM NEXT_TS - TS) AS NUMERIC) END AS Duration_Seconds
+FROM (
+        SELECT ApplicationId, UserId, TS_Type, TS, MAX(TS) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS, MAX(TS_Type) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS_Type
+        FROM kevin.Session_StartEnds 
+) t
+WHERE TS_Type = 'Start';
+
+CREATE INDEX ndx_sessiondurations_applicationid ON kevin.KPI_SessionDurations (ApplicationId);
