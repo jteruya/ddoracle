@@ -3,9 +3,9 @@
 
 $(document).ready(function() {
 
-bookmarkingusers_options = {
+featuresetup_options = {
   chart: {
-    renderTo: 'bookmarkingusers',
+    renderTo: 'featuresetup',
     type: 'spline',
     zoomType: 'x',
     height: 500,
@@ -13,25 +13,25 @@ bookmarkingusers_options = {
     borderWidth: 1
   },
   title: {
-    text: '% of Bookmarking Users per Month'
+    text: 'Events with specific Features set up - % by Month'
   },
   subtitle: {
-    text: '(for the past 13 months)'
+    text: '(for the past 7 months)'
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' % of Users Bookmarking';
+    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' % of Events';
 
     return s;
     }
   },
   legend: {
     enabled: true,
-    align: 'right',
-    verticalAlign: 'middle',
-    backgroundColor: '#FCFFC5',
-    borderColor: '#000000',
-    borderWidth: 1,
+    align: 'center',
+    verticalAlign: 'bottom',
+    // backgroundColor: '#FCFFC5',
+    // borderColor: '#000000',
+    // borderWidth: 1,
     layout: 'vertical'
   },
   xAxis: {
@@ -47,7 +47,7 @@ bookmarkingusers_options = {
     min: 0, // Minimum start at 0 on y-axis
     max: 100,
     title: {
-      text: '% of Bookmarking Users'
+      text: '% of Events'
     }
   },
   plotOptions: {
@@ -62,7 +62,7 @@ bookmarkingusers_options = {
   series: []
 };
 
-$.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
+$.get('csv/KPI_Robin_FeatureSetup.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
   var prev_name = ''
@@ -72,7 +72,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
     series = prev_series
     if (lineNo == linecnt) {
       console.log('End');
-      bookmarkingusers_options.series.push(series)
+      featuresetup_options.series.push(series)
       dummy = 1;
     }    
     else if (lineNo > 0) {
@@ -82,7 +82,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
         console.log('Continue');
 
         var year = parseInt(items[1].split('-')[0])
-        var month = parseInt(items[1].split('-')[1])
+        var month = parseInt(items[1].split('-')[1]) - 1
         
         series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
 
@@ -94,7 +94,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
         console.log('Start');
 
         if (prev_name != '') {
-          bookmarkingusers_options.series.push(series)  
+          featuresetup_options.series.push(series)  
         }
 
         var series = {
@@ -106,7 +106,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
         prev_name = items[0]
 
         var year = parseInt(items[1].split('-')[0])
-        var month = parseInt(items[1].split('-')[1])
+        var month = parseInt(items[1].split('-')[1]) - 1
 
         series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
         prev_series = series
@@ -117,7 +117,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
     }
   })
 
-bookmarkingusers = new Highcharts.Chart(bookmarkingusers_options);
+featuresetup = new Highcharts.Chart(featuresetup_options);
 
 });
 

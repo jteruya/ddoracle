@@ -9,7 +9,7 @@ appdurations_options = {
     type: 'spline',
     zoomType: 'x',
     height: 500,
-    width: 1000,
+    // width: 1000,
     borderWidth: 1
   },
   title: {

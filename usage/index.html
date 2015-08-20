@@ -6,14 +6,15 @@
   <meta charset="utf-8">
   <meta name="author" content="#datadawgs">
   <link rel="icon" href="image/favicon.ico" type="image/x-icon">
-  <title>Product Health - Bookmark KPIs</title>
+  <title>Product Health - Usage KPIs</title>
 
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <!-- <script src="js/highcharts.js"></script> -->
   <script src="http://code.highcharts.com/highcharts.js"></script>
 
-  <script src="js/KPI_Robin_BookmarksPerUser.js"></script>
-  <script src="js/KPI_Robin_PCTBookmarkingUsers.js"></script>
+  <script src="js/KPI_Robin_UserUsagePct.js"></script>
+  <script src="js/KPI_Robin_MenuItemBreakdown.js"></script>
+  <script src="js/KPI_Robin_1stTap_MenuItemBreakdown.js"></script>
 
   <style>
     /* img.icon {width: 100px; height: 100px;} */
@@ -32,7 +33,7 @@
   <!-- a href="../../">Back to Portal</a -->
   <div class="header">
     <img class="icon" src='image/logo.png'></img> 
-    <font face="Verdana"><h3>Product Health - Bookmark KPIs</h3>
+    <font face="Verdana"><h3>Product Health - Usage KPIs</h3>
     <!-- <a href="https://doubledutch.atlassian.net/wiki/display/PROD/Social">Confluence Documentation</a><br></font> -->
   
     (The following reports are powered by Robin) <p>
@@ -40,26 +41,35 @@
 
   <hr> <!-- ====================================================================== -->
 
-  <!-- Chart: Bookmarks per User -->
-  <div id="bookmarksperuser" class="chart" width='100%' style="float: center"></div>
+  <!-- Chart: User Usage Percentages -->
+  <div id="userusagepct" class="chart" width='100%' style="float: center"></div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_BookmarksPerUser.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_UserUsagePct.csv"><font size="2">Download CSV</font></a>
       <br>
-      (The above chart is planned for breakdown at the Event Type functionality once SalesForce integration is completed.) 
   </div>
 
   <br> <!-- ====================================================================== -->
 
-  <!-- Chart: Bookmarking Users -->
-  <div id="bookmarkingusers" class="chart" width='100%' style="float: center"></div>
+  <!-- Chart: Menu Item Tap Percentages -->
+  <div id="menuitembreakdown" class="chart" width='100%' style="float: center"></div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_PCTBookmarkingUsers.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_MenuItemBreakdown.csv"><font size="2">Download CSV</font></a>
       <br>
-      (The above chart is planned for breakdown at the Event Type functionality once SalesForce integration is completed.) 
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+  <!-- Chart: Menu Item 1st Tap Percentages -->
+  <div id="tap1_menuitembreakdown" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_1stTap_MenuItemBreakdown.csv"><font size="2">Download CSV</font></a>
+      <br>
   </div>
 
   <br> <!-- ====================================================================== -->
