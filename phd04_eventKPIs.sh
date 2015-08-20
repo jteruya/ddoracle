@@ -25,6 +25,7 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
 kpi_featuresetup_report="KPI_Robin_FeatureSetup"
+kpi_featureusage_report="KPI_Robin_FeatureUsage"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -52,7 +53,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-# $run_sql_robin $domain_wd/sql/$etl.sql
+$run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -81,6 +82,7 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_featuresetup_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featuresetup_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_featureusage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featureusage_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -88,7 +90,7 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-# $transpose $domain_wd/csv/$kpi_userusagepct_report.csv 
+# NONE TO PERFORM
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -107,9 +109,9 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-# sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-# sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-# sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -

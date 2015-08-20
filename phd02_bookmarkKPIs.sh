@@ -91,7 +91,6 @@ echo "--------------------------------------------------------------------------
 
 # Transpose the Result Set CSV
 $transpose $domain_wd/csv/$kpi_bookmarksperuser_report.csv 
-# $transpose $domain_wd/csv/$kpi_bookmarkingusers_report.csv 
 
 # ====================================================================================================== ========== 4
 #  4  #
