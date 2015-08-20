@@ -2,9 +2,9 @@
 
 # ================================================================================================================ -
 #
-# phd02_bookmarkKPIs.sh 
+# phd03_usageKPIs.sh 
 # ----------------------
-# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Bookmarks KPIs page. 
+# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Usage KPIs page. 
 # 
 #
 # 0. Set the Generic Fields for this script. 
@@ -18,14 +18,14 @@
 #  0  #
 # === #
 # Base fields
-kpi_domain="bookmark"
+kpi_domain="event"
 wd="oracle"
 etl="${kpi_domain}_etl"
 domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
-kpi_bookmarksperuser_report="KPI_Robin_BookmarksPerUser"
-kpi_bookmarkingusers_report="KPI_Robin_PCTBookmarkingUsers"
+kpi_featuresetup_report="KPI_Robin_FeatureSetup"
+kpi_featureusage_report="KPI_Robin_FeatureUsage"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -53,7 +53,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-# NONE
+$run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -81,8 +81,8 @@ echo "--------------------------------------------------------------------------
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-$run_sql_robin $domain_wd/sql/$kpi_bookmarksperuser_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_bookmarksperuser_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_bookmarkingusers_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_bookmarkingusers_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_featuresetup_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featuresetup_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_featureusage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featureusage_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -90,7 +90,7 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-$transpose $domain_wd/csv/$kpi_bookmarksperuser_report.csv 
+# NONE TO PERFORM
 
 # ====================================================================================================== ========== 4
 #  4  #
