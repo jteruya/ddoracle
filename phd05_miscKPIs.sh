@@ -25,6 +25,9 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
 kpi_sessionosdistribution_report="KPI_Robin_SessionOSDistribution"
+kpi_userdistribution_report="KPI_Robin_UserOSDistribution"
+kpi_devicedistribution_ios_report="KPI_Robin_DeviceDistribution_Android"
+kpi_devicedistribution_android_report="KPI_Robin_DeviceDistribution_iOS"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -81,6 +84,9 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_sessionosdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionosdistribution_report.csv 
+# $run_sql_robin $domain_wd/sql/$kpi_userdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userdistribution_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_devicedistribution_ios_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_ios_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_devicedistribution_android_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_android_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -107,9 +113,9 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-# sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-# sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-# sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
