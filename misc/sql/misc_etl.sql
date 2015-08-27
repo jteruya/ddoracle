@@ -60,7 +60,7 @@ SELECT * FROM (
                         WHERE AppTypeId IN (1,2)
                         GROUP BY 1,2
                 ) t
-        ) t WHERE PCT_CNT >= 0.5
+        ) t WHERE PCT_CNT >= 1.0
         UNION ALL
         --Get the distribution of Devices across all Users (Android)
         SELECT CAST('Android' AS TEXT) AS OS, * FROM (

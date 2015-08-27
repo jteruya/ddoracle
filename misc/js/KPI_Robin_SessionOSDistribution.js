@@ -20,7 +20,7 @@ sessionosdistribution_options = {
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + this.series.name + ' (' + Highcharts.dateFormat('%b %Y', this.x) + ')</b>: <br>' + this.y + ' % of Menu Item Taps';
+    var s = '<b>' + this.series.name + ' (' + Highcharts.dateFormat('%b %Y', this.x) + ')</b>: <br>' + this.y + ' % of Users';
 
     return s;
     }
