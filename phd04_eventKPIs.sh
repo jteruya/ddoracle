@@ -26,6 +26,7 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 # Report fields
 kpi_featuresetup_report="KPI_Robin_FeatureSetup"
 kpi_featureusage_report="KPI_Robin_FeatureUsage"
+kpi_eventcount_report="KPI_Robin_EventCount"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -83,6 +84,7 @@ echo "--------------------------------------------------------------------------
 
 $run_sql_robin $domain_wd/sql/$kpi_featuresetup_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featuresetup_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_featureusage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featureusage_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_eventcount_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_eventcount_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -91,6 +93,20 @@ echo "--------------------------------------------------------------------------
 
 # Transpose the Result Set CSV
 # NONE TO PERFORM
+
+# ====================================================================================================== ========== 3b
+echo "-------------------------------------------------------------------------------------------------"
+echo "REPORTS - Perform additional transformations ($kpi_domain) : " `date` 
+echo "-------------------------------------------------------------------------------------------------"
+
+#-------------#
+# EVENT COUNT #
+#-------------#
+# Prep the dataset for the Regression
+tail -n +2 $domain_wd/csv/$kpi_eventcount_report.csv > "${domain_wd}/csv/${kpi_eventcount_report}"_raw.csv
+
+# Run Regressions and generate the "predicted data"
+python $domain_wd/transform_Robin_EventCount.py "${domain_wd}/csv/${kpi_eventcount_report}"_raw
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -115,3 +131,11 @@ sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/imag
 sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
+#  6  #
+# === #
+echo "-------------------------------------------------------------------------------------------------"
+echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date` 
+echo "-------------------------------------------------------------------------------------------------"
+
+echo "Running cleanup_$etl.sql."
+$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
