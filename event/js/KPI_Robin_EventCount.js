@@ -6,7 +6,7 @@ $(document).ready(function() {
 eventcount_options = {
   chart: {
     renderTo: 'eventcount',
-    type: 'spline',
+    // type: 'scatter',
     zoomType: 'x',
     height: 500,
     // width: 1000,
@@ -49,12 +49,13 @@ eventcount_options = {
       text: 'Count of Events'
     }
   },
+  colors: ['rgba(223, 83, 83, .8)','rgba(119, 152, 191, .8)'],
   plotOptions: {
     series: {
       groupPadding: 0.1, // Spacing between x-axis categories
       marker: {
         enabled: true,
-        radius: 2 // Size of markers
+        radius: 5 // Size of markers
       }
     }
   },
@@ -90,15 +91,30 @@ $.get('csv/KPI_Robin_EventCount_pred.csv', function(data) {
       }
       else {
 
+        // We are starting another series (first new or next new)
         console.log('Start');
 
+        // Push out the previous series if we are starting a new one
         if (prev_name != '') {
           eventcount_options.series.push(series)  
         }
 
-        var series = {
+        // Initiate the series
+        if (prev_name == '') {
+          var series = {
           name: '',
+          type: 'scatter',
+          marker: { radius: 5},
           data: []
+          }
+        }
+        else {
+          var series = {
+          name: '',
+          type: 'line',
+          marker: { radius: 1},
+          data: []
+          }
         }
 
         series.name = items[0]
