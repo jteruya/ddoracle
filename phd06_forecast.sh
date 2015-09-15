@@ -2,9 +2,9 @@
 
 # ================================================================================================================ -
 #
-# phd04_eventKPIs.sh 
+# phd06_forecast.sh 
 # ----------------------
-# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Event KPIs page. 
+# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Forecast page. 
 # 
 #
 # 0. Set the Generic Fields for this script. 
@@ -18,14 +18,14 @@
 #  0  #
 # === #
 # Base fields
-kpi_domain="event"
+kpi_domain="forecast"
 wd="oracle"
 etl="${kpi_domain}_etl"
 domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
-kpi_featuresetup_report="KPI_Robin_FeatureSetup"
-kpi_featureusage_report="KPI_Robin_FeatureUsage"
+kpi_eventcount_report="KPI_Robin_EventCount"
+kpi_usercount_report="KPI_Robin_UserCount"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -53,7 +53,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-$run_sql_robin $domain_wd/sql/$etl.sql
+# NONE TO PERFORM
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -81,8 +81,8 @@ echo "--------------------------------------------------------------------------
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-$run_sql_robin $domain_wd/sql/$kpi_featuresetup_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featuresetup_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_featureusage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featureusage_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_eventcount_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_eventcount_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_usercount_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_usercount_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -91,6 +91,22 @@ echo "--------------------------------------------------------------------------
 
 # Transpose the Result Set CSV
 # NONE TO PERFORM
+
+# ====================================================================================================== ========== 3b
+echo "-------------------------------------------------------------------------------------------------"
+echo "REPORTS - Perform additional transformations ($kpi_domain) : " `date` 
+echo "-------------------------------------------------------------------------------------------------"
+
+#-------------#
+# EVENT COUNT #
+#-------------#
+# Prep the dataset for the Regression
+tail -n +2 $domain_wd/csv/$kpi_eventcount_report.csv > "${domain_wd}/csv/${kpi_eventcount_report}"_raw.csv
+tail -n +2 $domain_wd/csv/$kpi_usercount_report.csv > "${domain_wd}/csv/${kpi_usercount_report}"_raw.csv
+
+# Run Regressions and generate the "predicted data"
+python $domain_wd/transform_Robin_EventCount.py "${domain_wd}/csv/${kpi_eventcount_report}"_raw
+python $domain_wd/transform_Robin_UserCount.py "${domain_wd}/csv/${kpi_usercount_report}"_raw
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -121,5 +137,4 @@ echo "--------------------------------------------------------------------------
 echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-echo "Running cleanup_$etl.sql."
-$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+# NONE TO PERFORM
