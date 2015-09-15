@@ -46,7 +46,7 @@ usercount_options = {
   yAxis: {
     min: 0, // Minimum start at 0 on y-axis
     title: {
-      text: 'Count of Events'
+      text: 'Count of Active Users'
     }
   },
   colors: ['rgba(223, 83, 83, .8)','rgba(119, 152, 191, .8)'],
