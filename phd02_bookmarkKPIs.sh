@@ -115,3 +115,11 @@ sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/imag
 sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
+#  6  #
+# === #
+# echo "-------------------------------------------------------------------------------------------------"
+# echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date` 
+# echo "-------------------------------------------------------------------------------------------------"
+
+# echo "Running cleanup_$etl.sql."
+# NONE TO PERFORM

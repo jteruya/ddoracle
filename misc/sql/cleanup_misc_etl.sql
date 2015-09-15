@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS dashboard.kpi_social_metrics_session_os_version;
+DROP TABLE IF EXISTS dashboard.kpi_social_metrics_firstsession_os_version;
+DROP TABLE IF EXISTS dashboard.kpi_social_metrics_globalactivityfeed_views;
+DROP TABLE IF EXISTS dashboard.kpi_social_metrics_firstglobalactivityfeed_views;
+DROP TABLE IF EXISTS dashboard.kpi_social_metrics_device_pct;
