@@ -82,7 +82,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
         console.log('Continue');
 
         var year = parseInt(items[1].split('-')[0])
-        var month = parseInt(items[1].split('-')[1])
+        var month = parseInt(items[1].split('-')[1]) - 1 // offset months in JS
         
         series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
 
@@ -106,7 +106,7 @@ $.get('csv/KPI_Robin_PCTBookmarkingUsers.csv', function(data) {
         prev_name = items[0]
 
         var year = parseInt(items[1].split('-')[0])
-        var month = parseInt(items[1].split('-')[1])
+        var month = parseInt(items[1].split('-')[1]) - 1 // offset months in JS
 
         series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
         prev_series = series

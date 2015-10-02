@@ -3,9 +3,9 @@
 
 $(document).ready(function() {
 
-sessiondurations_options = {
+appdurations_options = {
   chart: {
-    renderTo: 'sessiondurations',
+    renderTo: 'appdurations',
     type: 'spline',
     zoomType: 'x',
     height: 500,
@@ -13,14 +13,14 @@ sessiondurations_options = {
     borderWidth: 1
   },
   title: {
-    text: 'Session Durations by week'
+    text: 'Per User, In-App Duration by week'
   },
   subtitle: {
-    text: '(Median across all sessions, past 8 weeks)'
+    text: '(Median across User In-App Durations, past 8 weeks)'
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %e, %Y', this.x) + '</b>: <br>' + this.y + ' seconds';
+    var s = '<b>' + Highcharts.dateFormat('%b %e, %Y', this.x) + '</b>: <br>' + this.y + ' minutes';
 
     return s;
     }
@@ -43,7 +43,7 @@ sessiondurations_options = {
   yAxis: {
     min: 0, // Minimum start at 0 on y-axis
     title: {
-      text: 'Duration (seconds)'
+      text: 'Duration (minutes)'
     }
   },
   plotOptions: {
@@ -58,7 +58,7 @@ sessiondurations_options = {
   series: []
 };
 
-$.get('csv/KPI_Alfred_SessionDurations.csv', function(data) {
+$.get('csv/KPI_Robin_AppDurations.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
   //console.error(linecnt)
@@ -101,11 +101,11 @@ $.get('csv/KPI_Alfred_SessionDurations.csv', function(data) {
 
       series.data.push([Date.parse(d),parseFloat(items[1])])
 
-      sessiondurations_options.series.push(series)
+      appdurations_options.series.push(series)
     }
   })
 
-sessiondurations = new Highcharts.Chart(sessiondurations_options);
+appdurations = new Highcharts.Chart(appdurations_options);
 
 });
 

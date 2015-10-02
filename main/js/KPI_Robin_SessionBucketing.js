@@ -46,7 +46,7 @@ sessionbucketing_options = {
   yAxis: {
     min: 0, // Minimum start at 0 on y-axis
     title: {
-      text: 'Number of Attendees'
+      text: '% of Attendees'
     }
   },
   plotOptions: {
@@ -61,7 +61,7 @@ sessionbucketing_options = {
   series: []
 };
 
-$.get('csv/KPI_Alfred_SessionBucketing.csv', function(data) {
+$.get('csv/KPI_Robin_SessionBucketing.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
 

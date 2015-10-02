@@ -15,7 +15,7 @@ JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM Ratings_UserCheckIns) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId
 WHERE iu.IsDisabled = 0
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
 ) t 
 GROUP BY 1,2
@@ -37,7 +37,7 @@ JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM dashboard.kpi_social_metrics_profileviews_classify WHERE ElseProfileView_Ind = 1) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId
 WHERE iu.IsDisabled = 0
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
 ) t 
 GROUP BY 1,2
@@ -59,7 +59,7 @@ JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM dashboard.kpi_social_metrics_profileviews_classify WHERE ElseProfileView_Ind = 0) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId
 WHERE iu.IsDisabled = 0
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
 ) t 
 GROUP BY 1,2

@@ -1,32 +1,31 @@
 --Identify all the Profile Views in the past 13 months
-DROP TABLE IF EXISTS dashboard.kpi_social_metrics_profileviews;
-CREATE TABLE dashboard.kpi_social_metrics_profileviews AS
+CREATE TEMPORARY TABLE kpi_social_metrics_profileviews TABLESPACE FastStorage AS
 SELECT
-Application_Id AS ApplicationId, Global_User_Id AS GlobalUserId, Metadata, CAST(Metadata ->> 'userid' AS TEXT) AS Metadata_UserId, Created, Binary_Version AS BinaryVersion
-FROM PUBLIC.Fact_Views_Old
+ApplicationId, GlobalUserId, Metadata, CAST(Metadata ->> 'userid' AS TEXT) AS Metadata_UserId, Created, BinaryVersion AS BinaryVersion
+FROM PUBLIC.V_Fact_Views_All
 WHERE Identifier = 'profile'
-AND Created >= CURRENT_DATE - INTERVAL'13 months'
+AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND CAST(Metadata ->> 'userid' AS TEXT) IS NOT NULL;
 
-CREATE INDEX ndx_kpi_social_metrics_profileviews ON dashboard.kpi_social_metrics_profileviews (ApplicationId, GlobalUserId);
+CREATE INDEX ndx_kpi_social_metrics_profileviews ON kpi_social_metrics_profileviews (ApplicationId, GlobalUserId);
 
 --Classify every Profile View
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_profileviews_classify;
 CREATE TABLE dashboard.kpi_social_metrics_profileviews_classify AS
 SELECT base.*, iu.UserId, CASE WHEN CAST(iu.UserId AS TEXT) <> CAST(base.Metadata_UserId AS TEXT) THEN 1 ELSE 0 END AS ElseProfileView_Ind
-FROM dashboard.kpi_social_metrics_profileviews base
+FROM kpi_social_metrics_profileviews base
 JOIN AuthDB_IS_Users iu ON base.ApplicationId = iu.ApplicationId AND base.GlobalUserId = iu.GlobalUserId;
 
 --Get all Exhibitor Item Views
-DROP TABLE IF EXISTS dashboard.kpi_social_metrics_exhibitorview_users;
-CREATE TABLE dashboard.kpi_social_metrics_exhibitorview_users AS
-SELECT DISTINCT Application_Id AS ApplicationId, Global_User_Id AS GlobalUserId
-FROM PUBLIC.Fact_Views_Old 
+CREATE TEMPORARY TABLE kpi_social_metrics_exhibitorview_users TABLESPACE FastStorage AS
+SELECT DISTINCT ApplicationId, GlobalUserId
+FROM PUBLIC.V_Fact_Views_All 
 WHERE Identifier = 'item' 
 AND Metadata ->> 'type' = 'exhibitor' 
-AND Created >= CURRENT_DATE - INTERVAL'13 months';
+AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+;
 
-CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON dashboard.kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId);
+CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId);
 
 --Identify per all active users whether they saw an Exhibitor Detail view (for apps with Exhibitor Items)
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_exhibitorviews;
@@ -38,9 +37,9 @@ CASE WHEN ex.GlobalUserId IS NOT NULL THEN 1 ELSE 0 END AS ViewExhibitor_Ind
 FROM AuthDB_Applications app 
 JOIN EventCube.Agg_Session_Per_AppUser agg ON app.ApplicationId = agg.ApplicationId --Only users that at least had a session in the app
 JOIN AuthDB_IS_Users iu ON agg.UserId = iu.UserId
-LEFT JOIN dashboard.kpi_social_metrics_exhibitorview_users ex ON iu.ApplicationId = ex.ApplicationId AND iu.GlobalUserId = ex.GlobalUserId
+LEFT JOIN kpi_social_metrics_exhibitorview_users ex ON iu.ApplicationId = ex.ApplicationId AND iu.GlobalUserId = ex.GlobalUserId
 WHERE app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
 AND app.ApplicationId IN (SELECT DISTINCT i.ApplicationId FROM Ratings_Item i JOIN Ratings_Topic t ON i.ParentTopicId = t.TopicId WHERE t.ListTypeId = 3 AND i.IsDisabled = 0) --Only events with Exhibitor Items
 ;
@@ -89,20 +88,20 @@ AppStartDate,
 CAST(EXTRACT(YEAR FROM AppStartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM AppStartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM AppStartDate) AS INT) AS YYYY_MM
 FROM (
 SELECT 
-a.Application_Id AS ApplicationId,
-a.Global_User_Id AS GLobalUserId,
+a.ApplicationId,
+a.GlobalUserId,
 CAST(a.Metadata ->> 'type' AS TEXT) AS MenuItemType,
 CAST(a.Metadata ->> 'listid' AS TEXT) AS MenuItemListId,
 CAST(a.Metadata ->> 'listtype' AS TEXT) AS MenuItemListType,
 a.Created,
 app.StartDate AS AppStartDate
-FROM PUBLIC.Fact_Actions_Old a
-JOIN PUBLIC.AuthDB_Applications app ON a.Application_Id = app.ApplicationId
+FROM PUBLIC.V_Fact_Actions_All a
+JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
 WHERE a.Identifier = 'menuitem'
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
-AND a.Created >= CURRENT_DATE - INTERVAL'13 months'
-AND a.Application_Id NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 ) t;
 
 CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_menuitem_dt ON dashboard.kpi_social_metrics_menuitemtaps (MenuItem, YYYY_MM);

@@ -25,9 +25,9 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
 kpi_adoption_report="KPI_Robin_AdoptionReport"
-kpi_sessionbucketing_report="KPI_Alfred_SessionBucketing"
-kpi_sessiondurations_report="KPI_Alfred_SessionDurations"
-kpi_appdurations_report="KPI_Alfred_AppDurations"
+kpi_sessionbucketing_report="KPI_Robin_SessionBucketing"
+kpi_sessiondurations_report="KPI_Robin_SessionDurations"
+kpi_appdurations_report="KPI_Robin_AppDurations"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -55,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-$run_sql_alfred $domain_wd/sql/$etl.sql
+$run_sql_robin $domain_wd/sql/$etl.sql 
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -84,9 +84,9 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_adoption_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_adoption_report.csv 
-$run_sql_alfred $domain_wd/sql/$kpi_sessionbucketing_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionbucketing_report.csv 
-$run_sql_alfred $domain_wd/sql/$kpi_sessiondurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessiondurations_report.csv 
-$run_sql_alfred $domain_wd/sql/$kpi_appdurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_appdurations_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_sessionbucketing_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionbucketing_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_sessiondurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessiondurations_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_appdurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_appdurations_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"

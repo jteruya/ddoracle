@@ -13,6 +13,6 @@ CAST(EXTRACT(YEAR FROM app.StartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(M
 FROM AuthDB_Applications app
 LEFT JOIN (SELECT DISTINCT ApplicationId FROM PUBLIC.Ratings_Surveys WHERE IsPoll = 'true' AND IsDisabled = 'false') poll ON app.ApplicationId = poll.ApplicationId
 WHERE app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(CAST(EXTRACT(YEAR FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') AS TEXT) || '-' || CASE WHEN EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') AS TEXT) || '-01 00:00:00' AS TIMESTAMP)
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 ) t GROUP BY 1,2 ORDER BY 1,2

@@ -16,6 +16,6 @@ LEFT JOIN (SELECT DISTINCT s.ApplicationId FROM PUBLIC.Ratings_SurveyResponses s
 LEFT JOIN (SELECT DISTINCT uci.ApplicationId FROM PUBLIC.Ratings_HashtagInstances hi JOIN PUBLIC.Ratings_UserCheckIns uci ON hi.CheckInId = uci.CheckInId) hashtags ON app.ApplicationId = hashtags.ApplicationId
 LEFT JOIN (SELECT DISTINCT iu.ApplicationId FROM PUBLIC.Ratings_MentionInstances mi JOIN PUBLIC.AuthDB_IS_Users iu ON mi.UserId = iu.UserId) mentions ON app.ApplicationId = mentions.ApplicationId
 WHERE app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CURRENT_DATE - INTERVAL'7 months'
+AND app.StartDate >= CAST(CAST(EXTRACT(YEAR FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') AS TEXT) || '-' || CASE WHEN EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'7 months') AS TEXT) || '-01 00:00:00' AS TIMESTAMP)
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 ;
