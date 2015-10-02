@@ -1,2 +1,2 @@
-DROP TABLE IF EXISTS dashboard.Session_StartEnds;
-DROP TABLE IF EXISTS dashboard.KPI_SessionDurations;
+DROP TABLE IF EXISTS dashboard.Session_Durations_Weekly;
+DROP TABLE IF EXISTS dashboard.App_Durations_Weekly;

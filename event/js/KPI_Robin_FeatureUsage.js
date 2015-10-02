@@ -20,7 +20,7 @@ featureusage_options = {
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' % of Events use ' + this.series.name;
+    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' % of Events used this feature: ' + this.series.name;
 
     return s;
     }
