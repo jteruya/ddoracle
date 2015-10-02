@@ -27,12 +27,12 @@ bookmarkingusers_options = {
   },
   legend: {
     enabled: true,
-    align: 'right',
-    verticalAlign: 'middle',
+    align: 'center',
+    verticalAlign: 'bottom',
     backgroundColor: '#FCFFC5',
     borderColor: '#000000',
     borderWidth: 1,
-    layout: 'vertical'
+    layout: 'horizontal'
   },
   xAxis: {
     title: {
