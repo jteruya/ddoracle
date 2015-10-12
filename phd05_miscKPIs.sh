@@ -26,8 +26,8 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 # Report fields
 kpi_sessionosdistribution_report="KPI_Robin_SessionOSDistribution"
 kpi_userdistribution_report="KPI_Robin_UserOSDistribution"
-kpi_devicedistribution_ios_report="KPI_Robin_DeviceDistribution_Android"
-kpi_devicedistribution_android_report="KPI_Robin_DeviceDistribution_iOS"
+kpi_devicedistribution_ios_report="KPI_Robin_DeviceDistribution_iOS"
+kpi_devicedistribution_android_report="KPI_Robin_DeviceDistribution_Android"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
