@@ -16,7 +16,7 @@ devicedistributionandroid_options = {
     text: 'User Device (Android) Distribution - by Month'
   },
   subtitle: {
-    text: '(for the past 5 months)'
+    text: '(for the past 3 months)'
   },
   tooltip: {
     formatter: function () {

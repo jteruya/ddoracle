@@ -8,12 +8,18 @@ Motorola Droid Ultra Maxx,2015-09,1.41
 Nexus 5,2015-07,1.82
 Nexus 5,2015-08,2.44
 Nexus 5,2015-09,2.56
+Nexus 6,2015-07,0
+Nexus 6,2015-08,0
+Nexus 6,2015-09,1.33
+OnePlus,2015-07,0
+OnePlus,2015-08,0
+OnePlus,2015-09,1.02
 Samsung Galaxy Note 3,2015-07,1.62
 Samsung Galaxy Note 3,2015-08,1.47
 Samsung Galaxy Note 3,2015-09,1.21
-Samsung Galaxy Note 4,2015-07,2.51
-Samsung Galaxy Note 4,2015-08,2.58
-Samsung Galaxy Note 4,2015-09,2.66
+Samsung Galaxy Note 4,2015-07,4.65
+Samsung Galaxy Note 4,2015-08,3.70
+Samsung Galaxy Note 4,2015-09,3.73
 Samsung Galaxy S3,2015-07,1.59
 Samsung Galaxy S3,2015-08,2.51
 Samsung Galaxy S3,2015-09,1.13
@@ -29,15 +35,3 @@ Samsung Galaxy S5,2015-09,13.20
 Samsung Galaxy S6,2015-07,1.49
 Samsung Galaxy S6,2015-08,1.92
 Samsung Galaxy S6,2015-09,2.58
-(untranslated) - bacon-A0001-OnePlus,2015-07,0
-(untranslated) - bacon-A0001-OnePlus,2015-08,0
-(untranslated) - bacon-A0001-OnePlus,2015-09,1.02
-(untranslated) - shamu-Nexus 6-motorola,2015-07,0
-(untranslated) - shamu-Nexus 6-motorola,2015-08,0
-(untranslated) - shamu-Nexus 6-motorola,2015-09,1.33
-(untranslated) - trltetmo-SM-N910T-samsung,2015-07,1.07
-(untranslated) - trltetmo-SM-N910T-samsung,2015-08,0
-(untranslated) - trltetmo-SM-N910T-samsung,2015-09,0
-(untranslated) - trlteuc-SAMSUNG-SM-N910A-samsung,2015-07,1.07
-(untranslated) - trlteuc-SAMSUNG-SM-N910A-samsung,2015-08,1.12
-(untranslated) - trlteuc-SAMSUNG-SM-N910A-samsung,2015-09,1.07

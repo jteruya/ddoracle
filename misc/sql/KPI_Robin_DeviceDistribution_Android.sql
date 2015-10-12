@@ -34,9 +34,12 @@ CASE
   WHEN mi.MMM_Info IN ('zerofltevzw,SM-G920V,samsung') THEN 'Samsung Galaxy S6'
   WHEN mi.MMM_Info = 'serranoltexx,GT-I9195,samsung' THEN 'Samsung Galaxy S4 Mini'
   WHEN mi.MMM_Info IN ('hltevzw,SM-N900V,samsung') THEN 'Samsung Galaxy Note 3'
-  WHEN mi.MMM_Info = 'trltevzw,SM-N910V,samsung' THEN 'Samsung Galaxy Note 4'
+  WHEN mi.MMM_Info LIKE '%SM%N910%samsung' THEN 'Samsung Galaxy Note 4'
   WHEN mi.MMM_Info = 'obake-maxx_verizon,XT1080,motorola' THEN 'Motorola Droid Ultra Maxx'
   WHEN mi.MMM_Info = 'quark_verizon,XT1254,motorola' THEN 'Motorola Droid Turbo Quark'
+  WHEN mi.MMM_Info LIKE '%A0001%OnePlus%' THEN 'OnePlus'
+  WHEN mi.MMM_Info LIKE '%Nexus 6%' THEN 'Nexus 6'
+
   ELSE '(untranslated) - ' || REPLACE(mi.MMM_Info,',','-')
 END AS MMM_Info,
 months.YYYY_MM,

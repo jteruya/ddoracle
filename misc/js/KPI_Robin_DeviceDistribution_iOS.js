@@ -16,7 +16,7 @@ devicedistributionios_options = {
     text: 'User Device (iOS) Distribution - by Month'
   },
   subtitle: {
-    text: '(for the past 5 months)'
+    text: '(for the past 3 months)'
   },
   tooltip: {
     formatter: function () {
