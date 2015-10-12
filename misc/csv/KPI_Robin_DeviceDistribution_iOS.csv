@@ -1,57 +1,28 @@
 mmm_info,yyyy_mm,sum
-iPad 2,2015-03,1.56
-iPad 2,2015-04,1.54
-iPad 2,2015-05,1.35
-iPad 2,2015-06,1.22
-iPad (3rd Gen),2015-03,1.23
-iPad (3rd Gen),2015-04,1.18
-iPad (3rd Gen),2015-05,0.52
-iPad (3rd Gen),2015-06,0
-iPad (4th Gen),2015-03,1.93
-iPad (4th Gen),2015-04,1.89
-iPad (4th Gen),2015-05,1.48
-iPad (4th Gen),2015-06,1.45
-iPad Air,2015-03,3.63
-iPad Air,2015-04,3.22
-iPad Air,2015-05,2.86
-iPad Air,2015-06,2.89
-iPad Air 2,2015-03,0.65
-iPad Air 2,2015-04,1.67
-iPad Air 2,2015-05,1.26
-iPad Air 2,2015-06,1.42
-iPad mini,2015-03,0.88
-iPad mini,2015-04,0.89
-iPad mini,2015-05,0.83
-iPad mini,2015-06,0.78
-iPad mini 2,2015-03,0.50
-iPad mini 2,2015-04,0
-iPad mini 2,2015-05,0.65
-iPad mini 2,2015-06,0
-iPhone 4,2015-03,2.02
-iPhone 4,2015-04,1.74
-iPhone 4,2015-05,1.80
-iPhone 4,2015-06,1.66
-iPhone 4s,2015-03,6.38
-iPhone 4s,2015-04,5.71
-iPhone 4s,2015-05,5.52
-iPhone 4s,2015-06,4.74
-iPhone 5,2015-03,33.44
-iPhone 5,2015-04,31.59
-iPhone 5,2015-05,30.94
-iPhone 5,2015-06,27.89
-iPhone 5C,2015-03,6.57
-iPhone 5C,2015-04,5.73
-iPhone 5C,2015-05,6.12
-iPhone 5C,2015-06,5.75
-iPhone 5s,2015-03,5.51
-iPhone 5s,2015-04,5.45
-iPhone 5s,2015-05,4.73
-iPhone 5s,2015-06,6.54
-iPhone 6,2015-03,24.95
-iPhone 6,2015-04,27.84
-iPhone 6,2015-05,30.13
-iPhone 6,2015-06,32.22
-iPhone 6 Plus,2015-03,7.63
-iPhone 6 Plus,2015-04,8.21
-iPhone 6 Plus,2015-05,8.70
-iPhone 6 Plus,2015-06,9.26
+iPad Air,2015-07,2.57
+iPad Air,2015-08,2.65
+iPad Air,2015-09,2.36
+iPad Air 2,2015-07,0
+iPad Air 2,2015-08,0
+iPad Air 2,2015-09,1.22
+iPhone 4,2015-07,1.01
+iPhone 4,2015-08,0
+iPhone 4,2015-09,0
+iPhone 4s,2015-07,4.91
+iPhone 4s,2015-08,3.84
+iPhone 4s,2015-09,3.61
+iPhone 5,2015-07,28.27
+iPhone 5,2015-08,27.10
+iPhone 5,2015-09,25.33
+iPhone 5C,2015-07,6.50
+iPhone 5C,2015-08,4.72
+iPhone 5C,2015-09,4.03
+iPhone 5s,2015-07,5.06
+iPhone 5s,2015-08,4.33
+iPhone 5s,2015-09,4.52
+iPhone 6,2015-07,32.52
+iPhone 6,2015-08,36.07
+iPhone 6,2015-09,38.86
+iPhone 6 Plus,2015-07,9.86
+iPhone 6 Plus,2015-08,11.24
+iPhone 6 Plus,2015-09,12.17

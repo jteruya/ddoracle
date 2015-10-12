@@ -2,9 +2,9 @@
 
 # ================================================================================================================ -
 #
-# phd02_bookmarkKPIs.sh 
+# phd05_miscKPIs.sh 
 # ----------------------
-# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Bookmarks KPIs page. 
+# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Misc KPIs page. 
 # 
 #
 # 0. Set the Generic Fields for this script. 
@@ -84,7 +84,7 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_sessionosdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionosdistribution_report.csv 
-# $run_sql_robin $domain_wd/sql/$kpi_userdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userdistribution_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_userdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userdistribution_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_devicedistribution_ios_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_ios_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_devicedistribution_android_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_android_report.csv 
 
