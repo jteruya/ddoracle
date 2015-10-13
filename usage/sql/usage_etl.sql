@@ -7,11 +7,11 @@ WHERE Identifier = 'profile'
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND CAST(Metadata ->> 'userid' AS TEXT) IS NOT NULL;
 
-CREATE INDEX ndx_kpi_social_metrics_profileviews ON kpi_social_metrics_profileviews (ApplicationId, GlobalUserId);
+CREATE INDEX ndx_kpi_social_metrics_profileviews ON kpi_social_metrics_profileviews (ApplicationId, GlobalUserId) TABLESPACE FastStorage;
 
 --Classify every Profile View
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_profileviews_classify;
-CREATE TABLE dashboard.kpi_social_metrics_profileviews_classify AS
+CREATE TABLE dashboard.kpi_social_metrics_profileviews_classify TABLESPACE FastStorage AS
 SELECT base.*, iu.UserId, CASE WHEN CAST(iu.UserId AS TEXT) <> CAST(base.Metadata_UserId AS TEXT) THEN 1 ELSE 0 END AS ElseProfileView_Ind
 FROM kpi_social_metrics_profileviews base
 JOIN AuthDB_IS_Users iu ON base.ApplicationId = iu.ApplicationId AND base.GlobalUserId = iu.GlobalUserId;
@@ -25,11 +25,11 @@ AND Metadata ->> 'type' = 'exhibitor'
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 ;
 
-CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId);
+CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId) TABLESPACE FastStorage;
 
 --Identify per all active users whether they saw an Exhibitor Detail view (for apps with Exhibitor Items)
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_exhibitorviews;
-CREATE TABLE dashboard.kpi_social_metrics_exhibitorviews AS
+CREATE TABLE dashboard.kpi_social_metrics_exhibitorviews TABLESPACE FastStorage AS
 SELECT CAST(EXTRACT(YEAR FROM app.StartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM app.StartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM app.StartDate) AS INT) AS YYYY_MM,
 app.ApplicationId,
 iu.UserId,
@@ -45,8 +45,8 @@ AND app.ApplicationId IN (SELECT DISTINCT i.ApplicationId FROM Ratings_Item i JO
 ;
 
 --Identify all MenuItem taps
-DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps;
-CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps AS
+--DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps;
+CREATE TEMPORARY TABLE kpi_social_metrics_menuitemtaps TABLESPACE FastStorage AS
 SELECT ApplicationId, GlobalUserId,
 CASE 
   WHEN LOWER(MenuItemListType) = 'agenda' THEN 'Agenda'
@@ -104,33 +104,33 @@ AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'
 AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 ) t;
 
-CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_menuitem_dt ON dashboard.kpi_social_metrics_menuitemtaps (MenuItem, YYYY_MM);
-CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_appusercreated ON dashboard.kpi_social_metrics_menuitemtaps (ApplicationId,GlobalUserId,Created);
+--CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_menuitem_dt ON dashboard.kpi_social_metrics_menuitemtaps (MenuItem, YYYY_MM) TABLESPACE FastStorage;
+--CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_appusercreated ON dashboard.kpi_social_metrics_menuitemtaps (ApplicationId,GlobalUserId,Created) TABLESPACE FastStorage;
 --CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_appuserdtcreated ON dashboard.kpi_social_metrics_menuitemtaps (ApplicationId,GlobalUserId,YYYY_MM,Created);
 
 --Menu Item Tap Percentages per month
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps_pct;
-CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_pct AS
+CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_pct TABLESPACE FastStorage AS
 SELECT * FROM (
 SELECT DISTINCT
 base.MenuItem, base.YYYY_MM, 
 ROUND(100 * CAST(COUNT(*) OVER (PARTITION BY base.MenuItem, base.YYYY_MM) AS NUMERIC) / CAST(SUM(1) OVER (PARTITION BY base.YYYY_MM) AS NUMERIC),2) AS PCT_MenuItemTaps
-FROM dashboard.kpi_social_metrics_menuitemtaps base
+FROM kpi_social_metrics_menuitemtaps base
 ) t WHERE PCT_MenuItemTaps >= 0.5; --Restrict to not include anything that never made it past 0.5%
 
 --Identify the first N tapped MenuItem selections per User
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps_firstN;
-CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_firstN AS
+CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_firstN TABLESPACE FastStorage AS
 SELECT *
 FROM (
 SELECT *, RANK() OVER (PARTITION BY ApplicationId, GlobalUserId, YYYY_MM ORDER BY Created ASC) AS RNK 
-FROM dashboard.kpi_social_metrics_menuitemtaps base
+FROM kpi_social_metrics_menuitemtaps base
 ) t
 WHERE RNK <= 5;
 
 --Per Month, what % of first Menu Item taps are for each selection choice?
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps_1st_pct;
-CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_1st_pct AS
+CREATE TABLE dashboard.kpi_social_metrics_menuitemtaps_1st_pct TABLESPACE FastStorage AS
 SELECT MenuItem, YYYY_MM, PCT_MenuItem
 FROM (
 SELECT DISTINCT YYYY_MM, MenuItem, 

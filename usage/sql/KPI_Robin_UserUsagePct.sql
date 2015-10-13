@@ -9,7 +9,7 @@ SELECT
   100 * CAST(SUM(StatusUpdateInd) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC) AS PCT_Users
 FROM (
 SELECT iu.ApplicationId, app.StartDate, iu.UserId, CASE WHEN uci.UserId IS NOT NULL THEN 1 ELSE 0 END AS StatusUpdateInd
-FROM EventCube.Agg_Sessions_Per_User agg --Only users that at least had a session in the app
+FROM EventCube.Agg_Session_Per_AppUser agg --Only users that at least had a session in the app
 JOIN AuthDB_IS_Users iu ON agg.UserId = iu.UserId
 JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM Ratings_UserCheckIns) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId
@@ -31,7 +31,7 @@ SELECT
   100 * CAST(SUM(StatusUpdateInd) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC) AS PCT_Users
 FROM (
 SELECT iu.ApplicationId, app.StartDate, iu.UserId, CASE WHEN uci.UserId IS NOT NULL THEN 1 ELSE 0 END AS StatusUpdateInd
-FROM EventCube.Agg_Sessions_Per_User agg --Only users that at least had a session in the app
+FROM EventCube.Agg_Session_Per_AppUser agg --Only users that at least had a session in the app
 JOIN AuthDB_IS_Users iu ON agg.UserId = iu.UserId
 JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM dashboard.kpi_social_metrics_profileviews_classify WHERE ElseProfileView_Ind = 1) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId
@@ -53,7 +53,7 @@ SELECT
   100 * CAST(SUM(StatusUpdateInd) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC) AS PCT_Users
 FROM (
 SELECT iu.ApplicationId, app.StartDate, iu.UserId, CASE WHEN uci.UserId IS NOT NULL THEN 1 ELSE 0 END AS StatusUpdateInd
-FROM EventCube.Agg_Sessions_Per_User agg --Only users that at least had a session in the app
+FROM EventCube.Agg_Session_Per_AppUser agg --Only users that at least had a session in the app
 JOIN AuthDB_IS_Users iu ON agg.UserId = iu.UserId
 JOIN AuthDB_Applications app ON iu.ApplicationId = app.ApplicationId
 LEFT JOIN (SELECT DISTINCT ApplicationId, UserId FROM dashboard.kpi_social_metrics_profileviews_classify WHERE ElseProfileView_Ind = 0) uci ON iu.ApplicationId = uci.ApplicationId AND iu.UserId = uci.UserId

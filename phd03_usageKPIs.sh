@@ -111,10 +111,10 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-# sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-# sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-# sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+sudo cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+sudo cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+sudo cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+sudo cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
 #  6  #
@@ -124,4 +124,4 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running cleanup_$etl.sql."
-# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
