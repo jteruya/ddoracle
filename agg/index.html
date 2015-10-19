@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="author" content="#datadawgs">
+  <link rel="icon" href="image/favicon.ico" type="image/x-icon">
+  <title>Product Data - Overall Aggregates</title>
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- <script src="js/highcharts.js"></script> -->
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+
+  <script src="js/KPI_Robin_ActiveUsersPerMonth.js"></script>
+  <script src="js/KPI_Robin_EventsPerMonth.js"></script>
+  <script src="js/KPI_Robin_MetricsPerMonth.js"></script>
+
+  <style>
+    /* img.icon {width: 100px; height: 100px;} */
+    div.header {width: 100%; text-align: center}
+    div.chart {width: 65%; height: 20%; margin: 0 auto;}
+    div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 5px; text-align: left}
+    div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px;  float: left}
+    div.linkbarcenter {width: 70%; padding-bottom: 30px; padding-top: 2px;  margin: 0 auto;}
+    div.linkbarright {width: 49%; padding-bottom: 30px; padding-top: 2px; float: right}
+    div.midbar {width: 100%; padding-bottom: 2px; padding-top: 2px;  float: left}
+  </style>
+
+</head>
+
+<body>
+  <!-- a href="../../">Back to Portal</a -->
+  <div class="header">
+    <img class="icon" src='image/logo.png'></img> 
+    <font face="Verdana"><h3>Product Data - Overall Aggregates</h3>
+    <!-- <a href="https://doubledutch.atlassian.net/wiki/display/PROD/Social">Confluence Documentation</a><br></font> -->
+  
+    <!-- (The following reports are powered by Robin) <p> -->
+  </div>
+
+  <hr> <!-- ====================================================================== -->
+
+  <!-- Chart: Activer Users per Month -->
+  <div id="activeuserspermonth" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_ActiveUsersPerMonth.csv"><font size="2">Download CSV</font></a>
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+  <!-- Chart: Events per Month -->
+  <div id="eventspermonth" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_EventsPerMonth.csv"><font size="2">Download CSV</font></a>
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+  <!-- Chart: Metrics per Month -->
+  <div id="metricspermonth" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_MetricsPerMonth.csv"><font size="2">Download CSV</font></a>
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+
+</body>
+
+</html>

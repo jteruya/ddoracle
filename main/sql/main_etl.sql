@@ -2,7 +2,7 @@
 -- Transformations for Downstream Usage --
 --======================================--
 --Get the set of Session Start/End Metrics from ALFRED source
-CREATE TEMPORARY TABLE ALFRED_SessionStartEnds TABLESPACE FastStorage AS 
+CREATE TEMPORARY TABLE SessionStartEnds TABLESPACE FastStorage AS 
 SELECT 
   CAST(EXTRACT(Year FROM CAST(TS AS Date)) AS TEXT)||'-'||CASE WHEN CAST(EXTRACT(Month FROM CAST(TS AS Date)) AS INT) < 10 THEN '0' ELSE '' END||CAST(EXTRACT(Month FROM CAST(TS AS Date)) AS TEXT) AS YYYY_MM,
   app.*, 
@@ -38,17 +38,12 @@ FROM (SELECT
       WHERE (BinaryVersion IS NULL OR UPPER(BinaryVersion) NOT LIKE '%FLOCK%') --Don't include any FLOCK/Test eapps
       AND UserId IS NOT NULL
       AND ApplicationId IN (SELECT ApplicationId FROM EventCube.BaseApps) --Base Apps we'll be cubing
-      AND SRC = 'Alfred'
+      AND SRC IN ('Alfred','Robin_Live')
       ) app
 ;
 
-CREATE INDEX ndx_alfredsessionstartends_applicationid_userid_yyyymm ON ALFRED_SessionStartEnds (ApplicationId, UserId, YYYY_MM);
-CREATE INDEX ndx_alfredsessionstartends_applicationid_userid_ts ON ALFRED_SessionStartEnds (ApplicationId, UserId, TS);
-
-
-
-
-
+CREATE INDEX ndx_alfredsessionstartends_applicationid_userid_yyyymm ON SessionStartEnds (ApplicationId, UserId, YYYY_MM);
+CREATE INDEX ndx_alfredsessionstartends_applicationid_userid_ts ON SessionStartEnds (ApplicationId, UserId, TS);
 
 --Identify the Durations per Each Session
 DROP TABLE IF EXISTS EventCube.Session_Durations;
@@ -58,8 +53,8 @@ CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN NEXT_TS - TS  END AS D
 CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN CAST(EXTRACT(EPOCH FROM NEXT_TS - TS) AS NUMERIC) END AS Duration_Seconds
 FROM (
         SELECT ApplicationId, UserId, TS_Type, TS, MAX(TS) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS, MAX(TS_Type) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS_Type
-        FROM Session_StartEnds 
-        WHERE Src = 'Alfred'
+        FROM SessionStartEnds 
+        WHERE Src IN ('Alfred','Robin_Live')
 ) t
 WHERE TS_Type = 'Start'
 UNION ALL
@@ -67,21 +62,6 @@ SELECT ApplicationId, UserId, 'Session' AS TS_Type, StartDate AS TS, EndDate AS 
 ;
 
 CREATE INDEX ndx_session_durations_applicationid ON EventCube.Session_Durations (ApplicationId);
-
---Identify User/Day Aggregate for Session Counts (for past 6 months)
-DROP TABLE IF EXISTS EventCube.Agg_Session_perUser_perDay CASCADE;
-CREATE TABLE EventCube.Agg_Session_perUser_perDay TABLESPACE FastStorage AS 
-SELECT CAST(EXTRACT(Year FROM CAST(StartDate AS Date)) AS TEXT)||'-'||CASE WHEN CAST(EXTRACT(Month FROM CAST(StartDate AS Date)) AS INT) < 10 THEN '0' ELSE '' END||CAST(EXTRACT(Month FROM CAST(StartDate AS Date)) AS TEXT) AS YYYY_MM, UserId, COUNT(*) AS Sessions
-FROM BaseSessions
-WHERE SRC = 'Alfred' AND MetricTypeId = 1 AND ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) 
-AND StartDate >= CAST(CAST(EXTRACT(YEAR FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') AS TEXT) || '-' || CASE WHEN EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') AS TEXT) || '-01 00:00:00' AS TIMESTAMP)
-GROUP BY 1,2
-UNION ALL
-SELECT CAST(EXTRACT(Year FROM CAST(StartDate AS Date)) AS TEXT)||'-'||CASE WHEN CAST(EXTRACT(Month FROM CAST(StartDate AS Date)) AS INT) < 10 THEN '0' ELSE '' END||CAST(EXTRACT(Month FROM CAST(StartDate AS Date)) AS TEXT) AS YYYY_MM, UserId, COUNT(*) AS Sessions
-FROM BaseSessions 
-WHERE SRC = 'Robin' AND ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) 
-AND StartDate >= CAST(CAST(EXTRACT(YEAR FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') AS TEXT) || '-' || CASE WHEN EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM CAST(CURRENT_DATE AS TIMESTAMP) - INTERVAL'6 months') AS TEXT) || '-01 00:00:00' AS TIMESTAMP)
-GROUP BY 1,2;
 
 --===============================================--
 -- Build out the datasets for use with reporting --
