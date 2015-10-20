@@ -39,7 +39,7 @@ CREATE TABLE kevin.Agg_Fact_Actions_per_YYYYMM AS
 SELECT EXTRACT(YEAR FROM DT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM DT) AS INT) < 10 THEN '0' ELSE '' END || EXTRACT(MONTH FROM DT) AS YYYY_MM, SUM(CNT) AS CNT FROM kevin.Agg_Fact_Actions_per_Day GROUP BY 1 ORDER BY 1;
 
 --Cleanup the memory
-DROP TABLE IF EXISTS Fact_ActionsDT;
+DROP TABLE IF EXISTS Fact_Actions_DT;
 
 --=========================================================
 --== VIEWS ==--
