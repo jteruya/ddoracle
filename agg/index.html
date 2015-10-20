@@ -8,6 +8,7 @@
   <link rel="icon" href="image/favicon.ico" type="image/x-icon">
   <title>Product Data - Overall Aggregates</title>
 
+  <script src="http://d3js.org/d3.v3.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <!-- <script src="js/highcharts.js"></script> -->
   <script src="http://code.highcharts.com/highcharts.js"></script>
@@ -18,10 +19,14 @@
 
   <style>
     /* img.icon {width: 100px; height: 100px;} */
+    body {font-family: 'Helvetica Neue', Helvetica; font-weight: 200; padding: 10px;}
+    table {width: 65%; margin: 0 auto; border-collapse: collapse; border: 2px black solid; font: 12px sans-serif;}
+    td {border: 1px black solid; padding: 2px; text-align: left;}
+    th {border: 1px black solid; padding: 2px; font-weight: bold; text-align: left; background-color: black; color: white;}
     div.header {width: 100%; text-align: center}
     div.chart {width: 65%; height: 20%; margin: 0 auto;}
     div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 5px; text-align: left}
-    div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px;  float: left}
+    div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px; float: left}
     div.linkbarcenter {width: 70%; padding-bottom: 30px; padding-top: 2px;  margin: 0 auto;}
     div.linkbarright {width: 49%; padding-bottom: 30px; padding-top: 2px; float: right}
     div.midbar {width: 100%; padding-bottom: 2px; padding-top: 2px;  float: left}
@@ -70,6 +75,49 @@
   </div>
 
   <br> <!-- ====================================================================== -->
+
+  <hr width="65%">
+  <div class="chart">
+      <font size="2">The following is a list of Events (US Server) that have started in the past 4 months. </font>
+  </div>
+
+  <!-- Tabular Data: Event-Level Aggregates -->
+  <div id="agg" class="chart" width='100%' style="float: center">
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/List_Robin_EventList_US.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("body").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/List_Robin_EventList_US.csv"><font size="2">Download CSV of below list.</font></a>
+  </div>
+
+  <br><!-- ================================================================================= -->
 
 
 </body>

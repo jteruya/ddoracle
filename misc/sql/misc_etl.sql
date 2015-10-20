@@ -7,21 +7,24 @@ FROM (
         UserId,
         AppTypeId, 
         BinaryVersion,
-        CASE WHEN MetricTypeId = 1 THEN StartDate WHEN MetricTypeId = 2 THEN EndDate END AS Created
+        StartDate AS Created
         FROM PUBLIC.V_Fact_Sessions_All
         WHERE 
         (  --Handle the old Session Format
-           MetricTypeId = 0
+           SRC = 'Robin'
            AND StartDate <= CURRENT_DATE --Only Session that have started in past 13 months
            AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
         ) OR
         (
            --Handle the current Session Format
-           MetricTypeId = 1
+           SRC IN ('Alfred','Robin_Live')
+           AND MetricTypeId = 1
            AND StartDate <= CURRENT_DATE --Only Session that have started in past 13 months
            AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
         )
 ) t;
+
+SELECT * FROM PUBLIC.V_Fact_Sessions_All WHERE MetricTypeId = 0
 
 CREATE INDEX ndx_kpi_social_metrics_session_os_version ON dashboard.kpi_social_metrics_session_os_version(YYYY_MM,AppTypeId) TABLESPACE FastStorage;
 CREATE INDEX ndx_kpi_social_metrics_session_os_version_user ON dashboard.kpi_social_metrics_session_os_version(UserId) TABLESPACE FastStorage;
