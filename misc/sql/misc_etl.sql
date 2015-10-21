@@ -24,8 +24,6 @@ FROM (
         )
 ) t;
 
-SELECT * FROM PUBLIC.V_Fact_Sessions_All WHERE MetricTypeId = 0
-
 CREATE INDEX ndx_kpi_social_metrics_session_os_version ON dashboard.kpi_social_metrics_session_os_version(YYYY_MM,AppTypeId) TABLESPACE FastStorage;
 CREATE INDEX ndx_kpi_social_metrics_session_os_version_user ON dashboard.kpi_social_metrics_session_os_version(UserId) TABLESPACE FastStorage;
 
