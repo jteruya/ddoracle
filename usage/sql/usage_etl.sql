@@ -49,17 +49,17 @@ AND app.ApplicationId IN (SELECT DISTINCT i.ApplicationId FROM Ratings_Item i JO
 CREATE TEMPORARY TABLE kpi_social_metrics_menuitemtaps TABLESPACE FastStorage AS
 SELECT ApplicationId, GlobalUserId,
 CASE 
-  WHEN LOWER(MenuItemListType) = 'agenda' THEN 'Agenda'
+  WHEN LOWER(MenuItemListType) = 'agenda' OR LOWER(MenuItemType) = 'agenda' THEN 'Agenda'
   WHEN LOWER(MenuItemListType) = 'regular' THEN 'List (Misc)'
   WHEN LOWER(MenuItemListType) = 'speakers' THEN 'Speakers'
   WHEN LOWER(MenuItemListType) = 'file' THEN 'Files'
   WHEN LOWER(MenuItemListType) = 'exhibitors' THEN 'Exhibitors'
   WHEN LOWER(MenuItemListType) = 'folder' THEN 'Folder'
   WHEN LOWER(MenuItemType) = 'list' AND MenuItemListType IS NULL THEN 'List (Unknown)'
-  WHEN LOWER(MenuItemType) = 'topic' AND MenuItemListType IS NULL THEN 'List (Unknown)'
+  WHEN LOWER(MenuItemType) IN ('topic','topicinfo') AND MenuItemListType IS NULL THEN 'List (Unknown)'
   WHEN LOWER(MenuItemType) = 'list' AND MenuItemListType = 'unspecified' THEN 'List (Unknown)'
-  WHEN LOWER(MenuItemType) = 'listgroup' THEN 'List Group'
-  WHEN LOWER(MenuItemType) = 'activities' THEN 'Activity Feed'
+  WHEN LOWER(MenuItemType) IN ('listgroup','subjects') THEN 'List Group'
+  WHEN LOWER(MenuItemType) IN ('activities','activityfeed') THEN 'Activity Feed'
   WHEN LOWER(MenuItemType) = 'activity' THEN 'Activity Card'
   WHEN LOWER(MenuItemType) IN ('bookmarks','favorites') THEN 'Bookmarks'
   WHEN LOWER(MenuItemType) = 'chats' THEN 'Chats'
@@ -71,7 +71,7 @@ CASE
   WHEN LOWER(MenuItemType) = 'map' THEN 'Interactive Map'
   WHEN LOWER(MenuItemType) = 'notifications' THEN 'Notifications'
   WHEN LOWER(MenuItemType) = 'photofeed' THEN 'Photofeed'
-  WHEN LOWER(MenuItemType) = 'polls' THEN 'Polls'
+  WHEN LOWER(MenuItemType) IN ('polls','poll') THEN 'Polls'
   WHEN LOWER(MenuItemType) = 'profile' THEN 'Profile'
   WHEN LOWER(MenuItemType) = 'qrcodescanner' THEN 'QR Code Scanner'
   WHEN LOWER(MenuItemType) = 'surveys' THEN 'Surveys'
@@ -79,6 +79,9 @@ CASE
   WHEN LOWER(MenuItemType) = 'switchevent' THEN 'Switch Event'
   WHEN LOWER(MenuItemType) = 'users' THEN 'Attendees'
   WHEN LOWER(MenuItemType) = 'web' THEN 'Web URL'
+  WHEN LOWER(MenuItemType) = 'badges' THEN 'Badges'
+  WHEN LOWER(MenuItemType) = 'settings' THEN 'Settings'
+  WHEN LOWER(MenuItemType) = 'hashtagfeed' THEN 'Hashtag Feed'
   ELSE '(N/A)'
 END AS MenuItem,
 MenuItemType,
