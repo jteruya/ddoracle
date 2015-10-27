@@ -20,16 +20,16 @@ adoption_options = {
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + '%';
+    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b> (' + this.series.name + '): <br>' + this.y + '%';
 
     return s;
     }
   },
   legend: {
-    enabled: false,
+    enabled: true,
     align: 'bottom',
     align: 'center',
-    layout: 'vertical'
+    layout: 'horizontal'
   },
   xAxis: {
     title: {
@@ -47,6 +47,14 @@ adoption_options = {
       text: ''
     }
   },
+  colors: [ 'rgba(241, 103, 69, 1)',
+            'rgba(255, 154, 3, 0.5)',
+            'rgba(7, 181, 30, 0.5)',
+            'rgba(76, 195, 217, 0.5)',
+            'rgba(147, 100, 141, 0.5)',
+            'rgba(64, 64, 64, 0.5)',
+            'rgba(75, 0, 130,0.5)',
+          ],
   plotOptions: {
     series: {
       groupPadding: 0.1, // Spacing between x-axis categories
@@ -59,33 +67,63 @@ adoption_options = {
   series: []
 };
 
-$.get('csv/KPI_Robin_AdoptionReport_transposed.csv', function(data) {
+$.get('csv/KPI_Robin_AdoptionReport.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
-  //console.error(linecnt)
+  var prev_name = ''
+  var prev_series = {}
 
-  var columns = lines[0].split(',')
   $.each(lines, function(lineNo, line) {
+    series = prev_series
     if (lineNo == linecnt) {
+      console.log('End');
+      adoption_options.series.push(series)
       dummy = 1;
     }    
     else if (lineNo > 0) {
       var items = line.split(',')
-      var series = {
-        name: '',
-        data: []
-      }
-      series.name = items[0]
-      $.each(items, function(itemNo, item) {
-        if (itemNo > 0) {
-          var year = parseInt(columns[itemNo].split('-')[0])
-          var month = parseInt(columns[itemNo].split('-')[1]) - 1 // offset months in JS
-          var value = parseFloat(items[itemNo]) 
-          series.data.push([Date.UTC(year,month,1),value])
 
+      if (items[0] == prev_name) {
+        console.log('Continue');
+
+        var year = parseInt(items[1].split('-')[0])
+        var month = parseInt(items[1].split('-')[1]) - 1
+        
+        series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
+
+        console.log(series);
+
+      }
+      else {
+
+        console.log('Start');
+
+        if (prev_name != '') {
+          adoption_options.series.push(series)  
         }
-      })
-      adoption_options.series.push(series)
+
+        var series = {
+          name: '',
+          lineWidth: 2.5,
+          data: []
+        }
+
+        if (prev_name == '') {
+          series.lineWidth = 10
+        }
+
+        series.name = items[0]
+        prev_name = items[0]
+
+        var year = parseInt(items[1].split('-')[0])
+        var month = parseInt(items[1].split('-')[1]) - 1
+
+        series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
+        prev_series = series
+
+        console.log(series);
+          
+      }
     }
   })
 
