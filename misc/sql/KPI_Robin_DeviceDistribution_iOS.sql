@@ -4,6 +4,8 @@ SELECT
 --mi.OS,
 --mi.MMM_Info,
 CASE
+  WHEN mi.MMM_Info = 'iPhone8,2' THEN 'iPhone 6s Plus'
+  WHEN mi.MMM_Info = 'iPhone8,1' THEN 'iPhone 6s'
   WHEN mi.MMM_Info = 'iPhone7,2' THEN 'iPhone 6'
   WHEN mi.MMM_Info = 'iPhone7,1' THEN 'iPhone 6 Plus'
   WHEN mi.MMM_Info = 'iPhone6,2' THEN 'iPhone 5s'
