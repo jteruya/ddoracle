@@ -40,7 +40,7 @@ SELECT UserId, AppTypeId, Created, YYYY_MM
 --Get the list of Activity Feed views with related Metadata
 CREATE TEMPORARY TABLE kpi_social_metrics_globalactivityfeed_views TABLESPACE FastStorage AS
 SELECT 
-ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, MMM_Info, Created, CAST(EXTRACT(YEAR FROM Created) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM Created) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM Created) AS INT) AS YYYY_MM 
+ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, DeviceOSVersion, MMM_Info, Created, CAST(EXTRACT(YEAR FROM Created) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM Created) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM Created) AS INT) AS YYYY_MM 
 FROM PUBLIC.V_Fact_Views_All 
 WHERE Identifier = 'activities' 
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'3 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'3 months')||'-01 00:00:00' AS TIMESTAMP) --Past 3 months
@@ -51,9 +51,9 @@ AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'3 months')||'-'||E
 --Identify the First Global Activity Feed view per User
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_firstglobalactivityfeed_views;
 CREATE TABLE dashboard.kpi_social_metrics_firstglobalactivityfeed_views TABLESPACE FastStorage AS
-SELECT ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, MMM_Info, Created, YYYY_MM 
+SELECT ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, DeviceOSVersion, MMM_Info, Created, YYYY_MM 
         FROM (
-                SELECT ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, MMM_Info, Created, YYYY_MM, MIN(Created) OVER (PARTITION BY ApplicationId, GlobalUserId) AS MinCreated
+                SELECT ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, DeviceOSVersion, MMM_Info, Created, YYYY_MM, MIN(Created) OVER (PARTITION BY ApplicationId, GlobalUserId) AS MinCreated
                 FROM kpi_social_metrics_globalactivityfeed_views
                 WHERE AppTypeId <> 0 AND GlobalUserId IS NOT NULL
         ) t WHERE Created = MinCreated;
@@ -90,4 +90,7 @@ SELECT * FROM (
         ) t WHERE PCT_CNT >= 1.0
 ) t
 ORDER BY 1,2;
+
+
+
 
