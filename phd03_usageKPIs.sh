@@ -27,6 +27,7 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 kpi_userusagepct_report="KPI_Robin_UserUsagePct"
 kpi_menuitembreakdown_report="KPI_Robin_MenuItemBreakdown"
 kpi_menuitem_1stTap_breakdown_report="KPI_Robin_1stTap_MenuItemBreakdown"
+kpi_menuitem_mosttappedperevent_report="KPI_Robin_MostTapped_perEvent"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -54,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-$run_sql_robin $domain_wd/sql/$etl.sql
+# $run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -82,9 +83,10 @@ echo "--------------------------------------------------------------------------
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-$run_sql_robin $domain_wd/sql/$kpi_userusagepct_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userusagepct_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_menuitembreakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitembreakdown_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_menuitem_1stTap_breakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitem_1stTap_breakdown_report.csv 
+# $run_sql_robin $domain_wd/sql/$kpi_userusagepct_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userusagepct_report.csv 
+# $run_sql_robin $domain_wd/sql/$kpi_menuitembreakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitembreakdown_report.csv 
+# $run_sql_robin $domain_wd/sql/$kpi_menuitem_1stTap_breakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitem_1stTap_breakdown_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_menuitem_mosttappedperevent_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitem_mosttappedperevent_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -111,10 +113,10 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+# cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+# cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+# cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+# cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
 #  6  #
@@ -124,4 +126,4 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running cleanup_$etl.sql."
-$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql

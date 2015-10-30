@@ -144,4 +144,72 @@ FROM dashboard.kpi_social_metrics_menuitemtaps_firstN
 WHERE RNK = 1 --Only care about the first tap
 ) t 
 WHERE t.PCT_MenuItem >= 0.5 --Minimum 0.5% of taps, otherwise not shown
-ORDER BY 1,2
+ORDER BY 1,2;
+
+--Identify the breakdown on Menu Item taps at the Event Level
+DROP TABLE IF EXISTS Event_MenuItemTaps;
+CREATE TEMPORARY TABLE Event_MenuItemTaps TABLESPACE FastStorage AS 
+SELECT a.ApplicationId,
+CASE
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('activities','activityfeed') THEN 'Activity Feed'
+  WHEN LOWER(CAST(a.Metadata ->> 'listtype' AS TEXT)) = 'agenda' OR LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) = 'agenda' THEN 'Agenda'
+  WHEN LOWER(CAST(a.Metadata ->> 'listtype' AS TEXT)) = 'speakers' THEN 'Speakers'
+  WHEN LOWER(CAST(a.Metadata ->> 'listtype' AS TEXT)) = 'exhibitors' THEN 'Exhibitors'
+  WHEN LOWER(CAST(a.Metadata ->> 'listtype' AS TEXT)) = 'folder' THEN 'Folder'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) = 'users' THEN 'Attendees'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('surveys') THEN 'Surveys'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('leaderboard') THEN 'Leaderboard'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('photofeed') THEN 'Photofeed'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('map') THEN 'Map'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('url') THEN 'Web View'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('item') THEN 'Item'
+  WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('switchevent') THEN 'Switch Event'
+  ELSE 'Other'
+END AS Tapped,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('url') THEN CAST(a.Metadata ->> 'url' AS TEXT) END AS URL,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('item') THEN CAST(a.Metadata ->> 'itemid' AS TEXT) END AS ItemId,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('list') THEN CAST(a.Metadata ->> 'listid' AS TEXT) END AS ListId
+FROM V_Fact_Actions_All a
+JOIN AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
+WHERE a.Identifier = 'menuitem'
+AND a.ApplicationId IN (
+        SELECT A.ApplicationId FROM AuthDB_Applications A
+        JOIN PUBLIC.AuthDB_Bundles B ON A.BundleId = B.BundleId
+        WHERE StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'1 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'1 months')||'-01 00:00:00' AS TIMESTAMP) --Past 4 months
+        --== Static Test Event filters
+        AND A.Name NOT LIKE '%DoubleDutch%' AND B.Name NOT LIKE '%DoubleDutch%' AND UPPER(B.Name) NOT IN ('PRIDE','DDQA')
+        AND A.BundleId NOT IN ('00000000-0000-0000-0000-000000000000','025AA15B-CE74-40AA-A4CC-04028401C8B3','89FD8F03-0D59-41AB-A6A7-2237D8AC4EB2','5A46600A-156A-441E-B594-40F7DEFB54F2','F95FE4A7-E86A-4661-AC59-8B423F1F540A','34B4E501-3F31-46A0-8F2A-0FB6EA5E4357','09E25995-8D8F-4C2D-8F55-15BA22595E11','5637BE65-6E3F-4095-BEB8-115849B5584A','9F3489D7-C93C-4C8B-8603-DDA6A9061116','D0F56154-E8E7-4566-A845-D3F47B8B35CC','BC35D4CE-C571-4F91-834A-A8136CA137C4','3E3FDA3D-A606-4013-8DDF-711A1871BD12','75CE91A5-BCC0-459A-B479-B3956EA09ABC','384D052E-0ABD-44D1-A643-BC590135F5A0','B752A5B3-AA53-4BCF-9F52-D5600474D198','15740A5A-25D8-4DC6-A9ED-7F610FF94085','0CBC9D00-1E6D-4DB3-95FC-C5FBB156C6DE','F0C4B2DB-A743-4FB2-9E8F-A80463E52B55','8A995A58-C574-421B-8F82-E3425D9054B0','6DBB91C8-6544-48EF-8B8D-A01B435F3757','F21325D8-3A43-4275-A8B8-B4B6E3F62DE0','DE8D1832-B4EA-4BD2-AB4B-732321328B04','7E289A59-E573-454C-825B-CF31B74C8506')
+) 
+AND app.StartDate <= CURRENT_DATE --Only Events that have already started
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'1 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'1 months')||'-01 00:00:00' AS TIMESTAMP) --Past 1 months
+AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'3 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'3 months')||'-01 00:00:00' AS TIMESTAMP) --Past 3 months
+AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
+;
+
+--By event, break down the counts on different Menu Items and identify their % of the total
+DROP TABLE IF EXISTS dashboard.kpi_event_menutapspct;
+CREATE TABLE dashboard.kpi_event_menutapspct AS
+SELECT DISTINCT base.ApplicationId, app.Name, Tapped, COUNT(*) OVER (PARTITION BY base.ApplicationId, Tapped) AS Taps, SUM(1) OVER (PARTITION BY base.ApplicationId) AS TotalTaps, 100 * CAST(COUNT(*) OVER (PARTITION BY base.ApplicationId, Tapped) AS NUMERIC) / CAST(SUM(1) OVER (PARTITION BY base.ApplicationId) AS NUMERIC) AS PCT_Taps
+FROM (
+        SELECT  m.ApplicationId, 
+                CASE 
+                  WHEN m.Tapped = 'Item' THEN CASE WHEN m.ItemId IS NOT NULL THEN 'Item ('||REPLACE(i.Name,',','')||')' ELSE 'Other' END 
+                  WHEN m.Tapped = 'Folder' THEN CASE WHEN m.ListId IS NOT NULL THEN 'Folder ('||REPLACE(t.Name,',','')||')' ELSE 'Other' END 
+                  WHEN m.Tapped = 'URL' THEN CASE WHEN m.URL IS NOT NULL THEN 'URL ('||REPLACE(m.URL,',','')||')' ELSE 'Other' END 
+                  ELSE m.Tapped 
+                END AS Tapped 
+        FROM Event_MenuItemTaps m
+        LEFT JOIN Ratings_Item i ON CAST(m.ItemId AS INT) = i.ItemId 
+        LEFT JOIN Ratings_Topic t ON CAST(m.ListId AS INT) = t.TopicId 
+        WHERE m.Tapped IN ('Item','Folder','URL')
+        UNION ALL
+        SELECT ApplicationId, Tapped FROM Event_MenuItemTaps WHERE Tapped NOT IN ('Item','Folder','URL')
+) base
+JOIN AuthDB_Applications app ON base.ApplicationId = app.ApplicationId
+ORDER BY 1,5 DESC;
+
+--Identify the top 10 Menu Items selected per Event
+DROP TABLE IF EXISTS dashboard.kpi_event_menutap_top;
+CREATE TABLE dashboard.kpi_event_menutap_top AS 
+SELECT * FROM (SELECT *, RANK() OVER (PARTITION BY ApplicationId ORDER BY PCT_Taps DESC, Tapped DESC) AS RNK FROM dashboard.kpi_event_menutapspct) t WHERE RNK <= 10;
+
