@@ -28,6 +28,9 @@ kpi_sessionosdistribution_report="KPI_Robin_SessionOSDistribution"
 kpi_userdistribution_report="KPI_Robin_UserOSDistribution"
 kpi_devicedistribution_ios_report="KPI_Robin_DeviceDistribution_iOS"
 kpi_devicedistribution_android_report="KPI_Robin_DeviceDistribution_Android"
+kpi_deviceosdistribution_iphone_report="KPI_Robin_DeviceOSDistribution_iPhone"
+kpi_deviceosdistribution_ipad_report="KPI_Robin_DeviceOSDistribution_iPad"
+kpi_deviceosdistribution_android_report="KPI_Robin_DeviceOSDistribution_Android"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -87,6 +90,9 @@ $run_sql_robin $domain_wd/sql/$kpi_sessionosdistribution_report.sql | sed \$d | 
 $run_sql_robin $domain_wd/sql/$kpi_userdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_userdistribution_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_devicedistribution_ios_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_ios_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_devicedistribution_android_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_devicedistribution_android_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_deviceosdistribution_iphone_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_deviceosdistribution_iphone_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_deviceosdistribution_ipad_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_deviceosdistribution_ipad_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_deviceosdistribution_android_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_deviceosdistribution_android_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -126,5 +132,5 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running cleanup_$etl.sql."
-# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
 
