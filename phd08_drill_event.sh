@@ -2,9 +2,9 @@
 
 # ================================================================================================================ -
 #
-# phd04_eventKPIs.sh 
+# phd08_drill_event.sh 
 # ----------------------
-# - Wrapper for all elements that must be run to generate the Product Health Dashboards - Event KPIs page. 
+# - Wrapper for all elements that must be run to generate the Event Detail Drill-down page. 
 # 
 #
 # 0. Set the Generic Fields for this script. 
@@ -18,19 +18,16 @@
 #  0  #
 # === #
 # Base fields
-kpi_domain="event"
+kpi_domain="drill_event"
 wd="oracle"
 etl="${kpi_domain}_etl"
 domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
-kpi_featuresetup_report="KPI_Robin_FeatureSetup"
-kpi_featureusage_report="KPI_Robin_FeatureUsage"
-kpi_satisfactioncardfeature_report="KPI_Robin_SatisfactionCardFeature"
+kpi_toptaps="KPI_Robin_TopTaps"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
-run_sql_alfred='psql -h 10.208.97.116 -p 5432 -U analytics -A -F"," etl -f '
 transpose="python $HOME/tools/transpose.py"
 index_insights_fill="python ${kpi_domain_wd}/index_insights_fill.py"
 email_reports_wd="$HOME/email_reports"
@@ -54,7 +51,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-$run_sql_robin $domain_wd/sql/$etl.sql
+# $run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -81,18 +78,13 @@ $run_sql_robin $domain_wd/sql/$etl.sql
 echo "-------------------------------------------------------------------------------------------------"
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
-
-$run_sql_robin $domain_wd/sql/$kpi_featuresetup_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featuresetup_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_featureusage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_featureusage_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_satisfactioncardfeature_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_satisfactioncardfeature_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_toptaps.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_toptaps.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
 echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
-
-# Transpose the Result Set CSV
-# NONE TO PERFORM
+#NONE
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -111,10 +103,10 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+# cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+# cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+# cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+# cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
 #  6  #
@@ -123,5 +115,6 @@ echo "--------------------------------------------------------------------------
 echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-echo "Running cleanup_$etl.sql."
-$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+# echo "Running cleanup_$etl.sql."
+# NONE
+

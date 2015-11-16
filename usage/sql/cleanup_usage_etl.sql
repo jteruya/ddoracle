@@ -4,3 +4,6 @@ DROP TABLE IF EXISTS dashboard.kpi_social_metrics_exhibitorview_users;
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_exhibitorviews;
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps;
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps_pct;
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Impressions;
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Actions;
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Attendees;
