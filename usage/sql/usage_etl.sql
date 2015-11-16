@@ -213,3 +213,51 @@ DROP TABLE IF EXISTS dashboard.kpi_event_menutap_top;
 CREATE TABLE dashboard.kpi_event_menutap_top AS 
 SELECT * FROM (SELECT *, RANK() OVER (PARTITION BY ApplicationId ORDER BY PCT_Taps DESC, Tapped DESC) AS RNK FROM dashboard.kpi_event_menutapspct) t WHERE RNK <= 10;
 
+
+
+
+--== Satisfaction Card Usage
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Events;
+CREATE TABLE dashboard.SatisfactionCard_Events AS
+SELECT app.ApplicationId, app.Name, app.StartDate, app.EndDate, sc.SatisfactionCard_Ind,
+CAST(EXTRACT(YEAR FROM app.StartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM app.StartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM app.StartDate) AS INT) AS YYYY_MM 
+FROM AuthDB_Applications app
+LEFT JOIN (SELECT ApplicationId, CAST(Metadata ->> 'send_satisfaction_card' AS BOOL) AS SatisfactionCard_Ind  FROM PUBLIC.ActivityFeedService) sc ON app.ApplicationId = sc.ApplicationId
+WHERE app.StartDate >= '2015-07-01'
+AND app.StartDate <= CURRENT_DATE
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents);
+
+--1. Identify the set of all Impressions
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Impressions;
+CREATE TABLE dashboard.SatisfactionCard_Impressions AS
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, CASE WHEN App_Type_Id IN (1,2) THEN 'ios' WHEN App_Type_Id = 3 THEN 'android' END AS DeviceType FROM PUBLIC.Fact_Impressions WHERE Identifier = 'satisfactioncard' UNION ALL
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, CASE WHEN App_Type_Id IN (1,2) THEN 'ios' WHEN App_Type_Id = 3 THEN 'android' END AS DeviceType FROM PUBLIC.Fact_Impressions_New WHERE Identifier = 'satisfactioncard' UNION ALL
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, Device_Type AS DeviceType FROM PUBLIC.Fact_Impressions_Live WHERE Identifier = 'satisfactionCard';
+
+CREATE INDEX ndx_satisfactioncard_impressions ON dashboard.SatisfactionCard_Impressions (ApplicationId);
+
+--2. Identify the set of all Actions
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Actions;
+CREATE TABLE dashboard.SatisfactionCard_Actions AS
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, CASE WHEN App_Type_Id IN (1,2) THEN 'ios' WHEN App_Type_Id = 3 THEN 'android' END AS DeviceType, Metadata FROM PUBLIC.Fact_Actions WHERE Identifier = 'satisfactionbutton' UNION ALL
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, CASE WHEN App_Type_Id IN (1,2) THEN 'ios' WHEN App_Type_Id = 3 THEN 'android' END AS DeviceType, Metadata FROM PUBLIC.Fact_Actions_New WHERE Identifier = 'satisfactionbutton' UNION ALL
+SELECT Created, UPPER(Application_id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId, Device_Type AS DeviceType, Metadata FROM PUBLIC.Fact_Actions_Live WHERE Identifier = 'satisfactionButton';
+
+CREATE INDEX ndx_satisfactioncard_actions ON dashboard.SatisfactionCard_Actions (ApplicationId);
+
+--3. Identify the set of Attendees per Event and flag based on tracking
+DROP TABLE IF EXISTS dashboard.SatisfactionCard_Attendees;
+CREATE TABLE dashboard.SatisfactionCard_Attendees AS
+SELECT app.ApplicationId, app.Name, app.YYYY_MM, app.SatisfactionCard_Ind, u.UserId, iu.GlobalUserId,
+--Flag at the Attendee Level
+CASE WHEN i.GlobalUserId IS NOT NULL THEN 1 ELSE 0 END AS Impression_Ind,
+CASE WHEN t.GlobalUserId IS NOT NULL THEN 1 ELSE 0 END AS Tap_Ind
+FROM dashboard.SatisfactionCard_Events app
+JOIN EventCube.Agg_Session_per_AppUser u ON app.ApplicationId = u.ApplicationId
+JOIN AuthDB_IS_Users iu ON u.UserId = iu.UserId
+LEFT JOIN (SELECT DISTINCT ApplicationId, GlobalUserId FROM dashboard.SatisfactionCard_Impressions) i ON app.ApplicationId = i.ApplicationId AND iu.GlobalUserId = i.GlobalUserId
+LEFT JOIN (SELECT DISTINCT ApplicationId, GlobalUserId FROM dashboard.SatisfactionCard_Actions) t ON app.ApplicationId = t.ApplicationId AND iu.GlobalUserId = t.GlobalUserId
+WHERE app.SatisfactionCard_Ind = 'true' --Events with Satisfaction Card feature turned ON
+AND iu.IsDisabled = 0 --Actual Attendees not flagged OFF
+;

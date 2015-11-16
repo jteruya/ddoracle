@@ -28,6 +28,7 @@ kpi_userusagepct_report="KPI_Robin_UserUsagePct"
 kpi_menuitembreakdown_report="KPI_Robin_MenuItemBreakdown"
 kpi_menuitem_1stTap_breakdown_report="KPI_Robin_1stTap_MenuItemBreakdown"
 kpi_menuitem_mosttappedperevent_report="KPI_Robin_MostTapped_perEvent"
+kpi_satisfactioncard_usage_report="KPI_Robin_SatisfactionCard_Usage"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -87,6 +88,7 @@ $run_sql_robin $domain_wd/sql/$kpi_userusagepct_report.sql | sed \$d | sed 's/\"
 $run_sql_robin $domain_wd/sql/$kpi_menuitembreakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitembreakdown_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_menuitem_1stTap_breakdown_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitem_1stTap_breakdown_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_menuitem_mosttappedperevent_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_menuitem_mosttappedperevent_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_satisfactioncard_usage_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_satisfactioncard_usage_report.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
