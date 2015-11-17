@@ -20,10 +20,9 @@ JOIN AuthDB_IS_Users iu ON base.ApplicationId = iu.ApplicationId AND base.Global
 CREATE TEMPORARY TABLE kpi_social_metrics_exhibitorview_users TABLESPACE FastStorage AS
 SELECT DISTINCT ApplicationId, GlobalUserId
 FROM PUBLIC.V_Fact_Views_All 
-WHERE Identifier = 'item' 
-AND Metadata ->> 'type' = 'exhibitor' 
+WHERE (Identifier = 'item' AND Metadata ->> 'type' = 'exhibitor') OR (Identifier = 'exhibitorprofile')
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
-;
+) t;
 
 CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId) TABLESPACE FastStorage;
 
@@ -44,44 +43,47 @@ AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
 AND app.ApplicationId IN (SELECT DISTINCT i.ApplicationId FROM Ratings_Item i JOIN Ratings_Topic t ON i.ParentTopicId = t.TopicId WHERE t.ListTypeId = 3 AND i.IsDisabled = 0) --Only events with Exhibitor Items
 ;
 
+--================================================================================================================================================================
+
 --Identify all MenuItem taps
 --DROP TABLE IF EXISTS dashboard.kpi_social_metrics_menuitemtaps;
 CREATE TEMPORARY TABLE kpi_social_metrics_menuitemtaps TABLESPACE FastStorage AS
 SELECT ApplicationId, GlobalUserId,
 CASE 
-  WHEN LOWER(MenuItemListType) = 'agenda' OR LOWER(MenuItemType) = 'agenda' THEN 'Agenda'
+  WHEN LOWER(MenuItemListType) = 'agenda' OR LOWER(MenuItemType) = 'agenda' OR LOWER(MenuItemUrl) LIKE  '%://agenda%' THEN 'Agenda'
   WHEN LOWER(MenuItemListType) = 'regular' THEN 'List (Misc)'
   WHEN LOWER(MenuItemListType) = 'speakers' THEN 'Speakers'
   WHEN LOWER(MenuItemListType) = 'file' THEN 'Files'
   WHEN LOWER(MenuItemListType) = 'exhibitors' THEN 'Exhibitors'
   WHEN LOWER(MenuItemListType) = 'folder' THEN 'Folder'
   WHEN LOWER(MenuItemType) = 'list' AND MenuItemListType IS NULL THEN 'List (Unknown)'
-  WHEN LOWER(MenuItemType) IN ('topic','topicinfo') AND MenuItemListType IS NULL THEN 'List (Unknown)'
+  WHEN (LOWER(MenuItemType) IN ('topic','topicinfo') AND MenuItemListType IS NULL) THEN 'List (Unknown)'
   WHEN LOWER(MenuItemType) = 'list' AND MenuItemListType = 'unspecified' THEN 'List (Unknown)'
-  WHEN LOWER(MenuItemType) IN ('listgroup','subjects') THEN 'List Group'
-  WHEN LOWER(MenuItemType) IN ('activities','activityfeed') THEN 'Activity Feed'
+  WHEN LOWER(MenuItemType) IN ('listgroup','subjects')  OR LOWER(MenuItemUrl) LIKE '%://subjects%' THEN 'List Group'
+  WHEN LOWER(MenuItemType) IN ('activities','activityfeed') OR LOWER(MenuItemUrl) LIKE '%://activityfeed%' THEN 'Activity Feed'
   WHEN LOWER(MenuItemType) = 'activity' THEN 'Activity Card'
-  WHEN LOWER(MenuItemType) IN ('bookmarks','favorites') THEN 'Bookmarks'
-  WHEN LOWER(MenuItemType) = 'chats' THEN 'Chats'
+  WHEN LOWER(MenuItemType) IN ('bookmarks','favorites')  OR LOWER(MenuItemUrl) LIKE '%://favorites%' THEN 'Bookmarks'
+  WHEN LOWER(MenuItemType) = 'chats' OR LOWER(MenuItemUrl) LIKE '%://messages%'THEN 'Chats'
   WHEN LOWER(MenuItemType) = 'following' THEN 'Following'
-  WHEN LOWER(MenuItemType) = 'globalsearch' THEN 'Search'
-  WHEN LOWER(MenuItemType) = 'item' THEN 'Item Detail'
-  WHEN LOWER(MenuItemType) = 'leaderboard' THEN 'Leaderboard'
-  WHEN LOWER(MenuItemType) = 'leads' THEN 'Leads'
-  WHEN LOWER(MenuItemType) = 'map' THEN 'Interactive Map'
+  WHEN LOWER(MenuItemType) = 'globalsearch'  OR LOWER(MenuItemUrl) LIKE '%://globalsearch%' THEN 'Search'
+  WHEN LOWER(MenuItemType) = 'item' OR LOWER(MenuItemUrl) LIKE '%://item%' THEN 'Item Detail'
+  WHEN LOWER(MenuItemType) = 'leaderboard' OR LOWER(MenuItemUrl) LIKE '%://leaderboard%' THEN 'Leaderboard'
+  WHEN LOWER(MenuItemType) = 'leads' OR LOWER(MenuItemUrl) LIKE '%://leads%' THEN 'Leads'
+  WHEN LOWER(MenuItemType) = 'map' OR LOWER(MenuItemUrl) LIKE '%://map%' THEN 'Interactive Map'
   WHEN LOWER(MenuItemType) = 'notifications' THEN 'Notifications'
-  WHEN LOWER(MenuItemType) = 'photofeed' THEN 'Photofeed'
-  WHEN LOWER(MenuItemType) IN ('polls','poll') THEN 'Polls'
-  WHEN LOWER(MenuItemType) = 'profile' THEN 'Profile'
-  WHEN LOWER(MenuItemType) = 'qrcodescanner' THEN 'QR Code Scanner'
-  WHEN LOWER(MenuItemType) = 'surveys' THEN 'Surveys'
+  WHEN LOWER(MenuItemType) = 'photofeed'  OR LOWER(MenuItemUrl) LIKE '%://photofeed%' THEN 'Photofeed'
+  WHEN LOWER(MenuItemType) IN ('polls','poll')  OR LOWER(MenuItemUrl) LIKE '%://poll%' THEN 'Polls'
+  WHEN LOWER(MenuItemType) = 'profile' OR LOWER(MenuItemUrl) LIKE '%://profile%' THEN 'Profile'
+  WHEN LOWER(MenuItemType) = 'qrcodescanner'  OR LOWER(MenuItemUrl) LIKE '%://qrcodescanner%' THEN 'QR Code Scanner'
+  WHEN LOWER(MenuItemType) = 'surveys'  OR LOWER(MenuItemUrl) LIKE '%://survey%' THEN 'Surveys'
   WHEN LOWER(MenuItemType) = 'survey' THEN 'Survey'
-  WHEN LOWER(MenuItemType) = 'switchevent' THEN 'Switch Event'
-  WHEN LOWER(MenuItemType) = 'users' THEN 'Attendees'
-  WHEN LOWER(MenuItemType) = 'web' THEN 'Web URL'
-  WHEN LOWER(MenuItemType) = 'badges' THEN 'Badges'
-  WHEN LOWER(MenuItemType) = 'settings' THEN 'Settings'
+  WHEN LOWER(MenuItemType) = 'switchevent' OR LOWER(MenuItemUrl) LIKE '%://switchevent%' THEN 'Switch Event'
+  WHEN LOWER(MenuItemType) = 'users'  OR LOWER(MenuItemUrl) LIKE '%://users%' THEN 'Attendees'
+  WHEN LOWER(MenuItemType) = 'web'  OR LOWER(MenuItemUrl) LIKE 'http%' THEN 'Web URL'
+  WHEN LOWER(MenuItemType) = 'badges' OR LOWER(MenuItemUrl) LIKE '%://badges%' THEN 'Badges'
+  WHEN LOWER(MenuItemType) = 'settings'  OR LOWER(MenuItemUrl) LIKE '%://settings%' THEN 'Settings'
   WHEN LOWER(MenuItemType) = 'hashtagfeed' THEN 'Hashtag Feed'
+  WHEN LOWER(MenuItemUrl) LIKE '%://update%' THEN 'Update'
   ELSE '(N/A)'
 END AS MenuItem,
 MenuItemType,
@@ -90,21 +92,74 @@ Created,
 AppStartDate,
 CAST(EXTRACT(YEAR FROM AppStartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM AppStartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM AppStartDate) AS INT) AS YYYY_MM
 FROM (
+
+--oldMetrics (ALL)
 SELECT 
 a.ApplicationId,
 a.GlobalUserId,
+a.Metadata,
 CAST(a.Metadata ->> 'type' AS TEXT) AS MenuItemType,
 CAST(a.Metadata ->> 'listid' AS TEXT) AS MenuItemListId,
 CAST(a.Metadata ->> 'listtype' AS TEXT) AS MenuItemListType,
+CAST(a.Metadata ->> 'Url' AS TEXT) AS MenuItemURL,
 a.Created,
 app.StartDate AS AppStartDate
 FROM PUBLIC.V_Fact_Actions_All a
 JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
-WHERE a.Identifier = 'menuitem'
+WHERE a.SRC NOT IN ('New_Metrics')
+AND a.Identifier IN ('menuitem')
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
 AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
 AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
+
+UNION ALL
+
+--newMetrics (non-List)
+SELECT 
+a.ApplicationId,
+a.GlobalUserId,
+a.Metadata,
+CAST(a.Metadata ->> 'type' AS TEXT) AS MenuItemType,
+CAST(a.Metadata ->> 'listid' AS TEXT) AS MenuItemListId,
+CAST(a.Metadata ->> 'listtype' AS TEXT) AS MenuItemListType,
+CAST(a.Metadata ->> 'Url' AS TEXT) AS MenuItemURL,
+a.Created,
+app.StartDate AS AppStartDate
+FROM PUBLIC.V_Fact_Actions_All a
+JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
+WHERE a.SRC IN ('New_Metrics')
+AND a.Identifier IN ('menuItem')
+AND app.StartDate <= CURRENT_DATE --Only Events that have already started
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
+AND CAST(a.Metadata ->> 'Url' AS TEXT) NOT LIKE '%://topic%'
+
+UNION ALL
+
+--newMetrics (List)
+SELECT 
+a.ApplicationId,
+a.GlobalUserId,
+a.Metadata,
+CAST(NULL AS TEXT) AS MenuItemType,
+REPLACE(REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://topic/',''),'dd://topicinfo/','') AS MenuItemListId,
+CASE WHEN t.ListTypeId = 1 THEN 'regular' WHEN t.ListTypeId = 3 THEN 'exhibitors' WHEN t.ListTypeId = 4 THEN 'speakers' WHEN t.ListTypeId = 5 THEN 'folder' END AS MenuItemListType,
+CAST(a.Metadata ->> 'Url' AS TEXT) AS MenuItemURL,
+a.Created,
+app.StartDate AS AppStartDate
+FROM PUBLIC.V_Fact_Actions_All a
+JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
+LEFT JOIN Ratings_Topic t ON CAST(REPLACE(REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://topic/',''),'dd://topicinfo/','') AS INT) = t.TopicId
+WHERE a.SRC IN ('New_Metrics')
+AND a.Identifier IN ('menuItem')
+AND app.StartDate <= CURRENT_DATE --Only Events that have already started
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
+AND CAST(a.Metadata ->> 'Url' AS TEXT) LIKE '%://topic%'
+
 ) t;
 
 --CREATE INDEX ndx_kpi_social_metrics_menuitemtaps_menuitem_dt ON dashboard.kpi_social_metrics_menuitemtaps (MenuItem, YYYY_MM) TABLESPACE FastStorage;
@@ -146,10 +201,16 @@ WHERE RNK = 1 --Only care about the first tap
 WHERE t.PCT_MenuItem >= 0.5 --Minimum 0.5% of taps, otherwise not shown
 ORDER BY 1,2;
 
+--================================================================================================================================================================
+
 --Identify the breakdown on Menu Item taps at the Event Level
 DROP TABLE IF EXISTS Event_MenuItemTaps;
 CREATE TEMPORARY TABLE Event_MenuItemTaps TABLESPACE FastStorage AS 
-SELECT a.ApplicationId,
+SELECT a.ApplicationId, a.Tapped, a.URL, a.ItemId, a.ListId
+
+FROM (
+-- Old Metrics Case
+SELECT a.ApplicationId, a.Created,
 CASE
   WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('activities','activityfeed') THEN 'Activity Feed'
   WHEN LOWER(CAST(a.Metadata ->> 'listtype' AS TEXT)) = 'agenda' OR LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) = 'agenda' THEN 'Agenda'
@@ -167,12 +228,59 @@ CASE
   ELSE 'Other'
 END AS Tapped,
 CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('url') THEN CAST(a.Metadata ->> 'url' AS TEXT) END AS URL,
-CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('item') THEN CAST(a.Metadata ->> 'itemid' AS TEXT) END AS ItemId,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('item') THEN CAST(a.Metadata ->> 'itemid' AS TEXT) WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://item%' THEN REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://item/','') END AS ItemId,
 CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('list') THEN CAST(a.Metadata ->> 'listid' AS TEXT) END AS ListId
 FROM V_Fact_Actions_All a
+WHERE a.SRC NOT IN ('New_Metrics')
+AND a.Identifier IN ('menuitem')
+
+UNION ALL
+
+-- New Metrics Case (Non-List)
+SELECT a.ApplicationId, a.Created,
+CASE
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://activityfeed%' THEN 'Activity Feed'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://agenda%' THEN 'Agenda'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://users%' THEN 'Attendees'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://survey%' THEN 'Surveys'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://leaderboard%' THEN 'Leaderboard'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://photofeed%' THEN 'Photofeed'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://map%' THEN 'Map'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE 'http%'THEN 'Web View'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://item%' THEN 'Item'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://switchevent%' THEN 'Switch Event'
+  WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://poll%' THEN 'Polls'
+  ELSE 'Other'
+END AS Tapped,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('url') THEN CAST(a.Metadata ->> 'url' AS TEXT) END AS URL,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('item') THEN CAST(a.Metadata ->> 'itemid' AS TEXT) WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://item%' THEN REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://item/','') END AS ItemId,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('list') THEN CAST(a.Metadata ->> 'listid' AS TEXT) END AS ListId
+FROM V_Fact_Actions_All a
+WHERE a.SRC IN ('New_Metrics')
+AND a.Identifier IN ('menuItem')
+AND LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) NOT LIKE '%://topic%'
+
+UNION ALL
+
+-- New Metrics Case (Lists)
+SELECT a.ApplicationId, a.Created,
+CASE
+  WHEN t.ListTypeId = 4 THEN 'Speakers'
+  WHEN t.ListTypeId = 3 THEN 'Exhibitors'
+  WHEN t.ListTypeId = 5 THEN 'Folder'
+  ELSE 'Other'
+END AS Tapped,
+CAST(NULL AS TEXT) AS URL,
+CAST(NULL AS TEXT) AS ItemId,
+CASE WHEN LOWER(CAST(a.Metadata ->> 'type' AS TEXT)) IN ('list') THEN CAST(a.Metadata ->> 'listid' AS TEXT) WHEN LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://topic%' THEN REPLACE(REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://topic/',''),'dd://topicinfo/','') END AS ListId
+FROM V_Fact_Actions_All a
+LEFT JOIN Ratings_Topic t ON CAST(REPLACE(REPLACE(CAST(a.Metadata ->> 'Url' AS TEXT),'dd://topic/',''),'dd://topicinfo/','') AS INT) = t.TopicId
+WHERE a.SRC IN ('New_Metrics')
+AND a.Identifier IN ('menuItem')
+AND LOWER(CAST(a.Metadata ->> 'Url' AS TEXT)) LIKE '%://topic%'
+) a
 JOIN AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
-WHERE a.Identifier = 'menuitem'
-AND a.ApplicationId IN (
+WHERE a.ApplicationId IN (
         SELECT A.ApplicationId FROM AuthDB_Applications A
         JOIN PUBLIC.AuthDB_Bundles B ON A.BundleId = B.BundleId
         WHERE StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'1 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'1 months')||'-01 00:00:00' AS TIMESTAMP) --Past 4 months
@@ -213,8 +321,7 @@ DROP TABLE IF EXISTS dashboard.kpi_event_menutap_top;
 CREATE TABLE dashboard.kpi_event_menutap_top AS 
 SELECT * FROM (SELECT *, RANK() OVER (PARTITION BY ApplicationId ORDER BY PCT_Taps DESC, Tapped DESC) AS RNK FROM dashboard.kpi_event_menutapspct) t WHERE RNK <= 10;
 
-
-
+--================================================================================================================================================================
 
 --== Satisfaction Card Usage
 DROP TABLE IF EXISTS dashboard.SatisfactionCard_Events;

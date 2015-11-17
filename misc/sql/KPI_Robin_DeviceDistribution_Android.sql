@@ -32,6 +32,7 @@ CASE
   WHEN mi.MMM_Info LIKE 'jf%,samsung' THEN 'Samsung Galaxy S4'
   WHEN mi.MMM_Info LIKE 'klt%,samsung' THEN 'Samsung Galaxy S5'
   WHEN mi.MMM_Info IN ('zerofltevzw,SM-G920V,samsung') THEN 'Samsung Galaxy S6'
+  WHEN mi.MMM_Info IN ('zerofltevzw,SM-G925V,samsung') THEN 'Samsung Galaxy S6 Edge'
   WHEN mi.MMM_Info = 'serranoltexx,GT-I9195,samsung' THEN 'Samsung Galaxy S4 Mini'
   WHEN mi.MMM_Info IN ('hltevzw,SM-N900V,samsung') THEN 'Samsung Galaxy Note 3'
   WHEN mi.MMM_Info LIKE '%SM%N910%samsung' THEN 'Samsung Galaxy Note 4'

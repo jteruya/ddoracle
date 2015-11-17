@@ -17,6 +17,7 @@ FROM (SELECT
         SRC,
         ApplicationId,
         UserId, 
+        GlobalUserId,
         DeviceId, 
         AppTypeId, 
         CASE WHEN MetricTypeId = 1 THEN StartDate WHEN MetricTypeId = 2 THEN EndDate ELSE EndDate END AS DT,
@@ -30,7 +31,7 @@ FROM (SELECT
         END AS Binary_Version
       FROM PUBLIC.V_Fact_Sessions_ALL
       WHERE (BinaryVersion IS NULL OR UPPER(BinaryVersion) NOT LIKE '%FLOCK%') --Don't include any FLOCK/Test eapps
-      AND UserId IS NOT NULL
+      AND (UserId IS NOT NULL OR GlobalUserId IS NOT NULL)
       AND ApplicationId IN (SELECT ApplicationId FROM EventCube.BaseApps) --Base Apps we'll be cubing
       ) app
 ;
@@ -39,7 +40,7 @@ FROM (SELECT
 -- Transformations for Downstream Usage --
 --======================================--
 
---Get the set of Session Start/End Metrics from ALFRED source
+--Get the set of Session Start/End Metrics from Live sources
 CREATE TEMPORARY TABLE SessionStartEnds TABLESPACE FastStorage AS 
 SELECT 
   CAST(EXTRACT(Year FROM CAST(TS AS Date)) AS TEXT)||'-'||CASE WHEN CAST(EXTRACT(Month FROM CAST(TS AS Date)) AS INT) < 10 THEN '0' ELSE '' END||CAST(EXTRACT(Month FROM CAST(TS AS Date)) AS TEXT) AS YYYY_MM,
@@ -59,6 +60,7 @@ FROM (SELECT
         SRC,
         ApplicationId,
         UserId, 
+        GlobalUserId,
         DeviceId, 
         AppTypeId, 
         --CASE WHEN MetricTypeId = 1 THEN StartDate WHEN MetricTypeId = 2 THEN EndDate ELSE EndDate END AS DT,
@@ -74,9 +76,9 @@ FROM (SELECT
         END AS Binary_Version
       FROM PUBLIC.V_Fact_Sessions_ALL
       WHERE (BinaryVersion IS NULL OR UPPER(BinaryVersion) NOT LIKE '%FLOCK%') --Don't include any FLOCK/Test eapps
-      AND UserId IS NOT NULL
+      AND (UserId IS NOT NULL OR GlobalUserId IS NOT NULL)
       AND ApplicationId IN (SELECT ApplicationId FROM EventCube.BaseApps) --Base Apps we'll be cubing
-      AND SRC IN ('Alfred','Robin_Live')
+      AND SRC IN ('Alfred','Robin_Live','New_Metrics')
       ) app
 ;
 
@@ -86,17 +88,17 @@ CREATE INDEX ndx_alfredsessionstartends_applicationid_userid_ts ON SessionStartE
 --Identify the Durations per Each Session
 DROP TABLE IF EXISTS EventCube.Session_Durations;
 CREATE TABLE EventCube.Session_Durations TABLESPACE FastStorage AS
-SELECT ApplicationId, UserId, TS_Type, TS, NEXT_TS,
+SELECT ApplicationId, UserId, GlobalUserId, TS_Type, TS, NEXT_TS,
 CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN NEXT_TS - TS  END AS Duration,
 CASE WHEN TS_Type = 'Start' AND NEXT_TS_Type = 'End' THEN CAST(EXTRACT(EPOCH FROM NEXT_TS - TS) AS NUMERIC) END AS Duration_Seconds
 FROM (
-        SELECT ApplicationId, UserId, TS_Type, TS, MAX(TS) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS, MAX(TS_Type) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS_Type
+        SELECT ApplicationId, UserId, GlobalUserId, TS_Type, TS, MAX(TS) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS, MAX(TS_Type) OVER (PARTITION BY ApplicationId, UserId ORDER BY ApplicationId, UserId, TS ROWS BETWEEN 1 FOLLOWING and 1 FOLLOWING) AS NEXT_TS_Type
         FROM SessionStartEnds 
-        WHERE Src IN ('Alfred','Robin_Live')
+        --WHERE Src IN ('Alfred','Robin_Live','New_Metrics')
 ) t
 WHERE TS_Type = 'Start'
 UNION ALL
-SELECT ApplicationId, UserId, 'Session' AS TS_Type, StartDate AS TS, EndDate AS NEXT_TS, EndDate - StartDate AS Duration, CAST(EXTRACT(EPOCH FROM EndDate - StartDate) AS NUMERIC) AS Duration_Seconds FROM BaseSessions WHERE MetricTypeId IS NULL
+SELECT ApplicationId, UserId, GlobalUserId, 'Session' AS TS_Type, StartDate AS TS, EndDate AS NEXT_TS, EndDate - StartDate AS Duration, CAST(EXTRACT(EPOCH FROM EndDate - StartDate) AS NUMERIC) AS Duration_Seconds FROM BaseSessions WHERE MetricTypeId IS NULL
 ;
 
 CREATE INDEX ndx_session_durations_applicationid ON EventCube.Session_Durations (ApplicationId);
