@@ -16,11 +16,29 @@ FROM (
            AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
         ) OR
         (
-           --Handle the current Session Format
+           --Handle the oldMetrics Session Format
            SRC IN ('Alfred','Robin_Live')
            AND MetricTypeId = 1
            AND StartDate <= CURRENT_DATE --Only Session that have started in past 13 months
            AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
+        )
+        
+        UNION ALL
+        
+        SELECT 
+        b.UserId,
+        a.AppTypeId, 
+        a.BinaryVersion,
+        a.StartDate AS Created
+        FROM PUBLIC.V_Fact_Sessions_All a
+        JOIN PUBLIC.AuthDB_IS_Users b ON a.GlobalUserId = b.GlobalUserId AND a.ApplicationId = b.ApplicationId
+        WHERE
+        (
+           --Handle the newMetrics Session Format
+           a.SRC IN ('New_Metrics')
+           AND a.MetricTypeId = 1
+           AND a.StartDate <= CURRENT_DATE --Only Session that have started in past 13 months
+           AND a.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
         )
 ) t;
 
