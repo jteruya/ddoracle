@@ -22,7 +22,7 @@ SELECT DISTINCT ApplicationId, GlobalUserId
 FROM PUBLIC.V_Fact_Views_All 
 WHERE (Identifier = 'item' AND Metadata ->> 'type' = 'exhibitor') OR (Identifier = 'exhibitorprofile')
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
-) t;
+;
 
 CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId) TABLESPACE FastStorage;
 
