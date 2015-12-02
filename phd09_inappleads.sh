@@ -131,6 +131,6 @@ echo "--------------------------------------------------------------------------
 echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-echo "Running cleanup_$etl.sql."
+# echo "Running cleanup_$etl.sql."
 # $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
 
