@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="author" content="#datadawgs">
+  <link rel="icon" href="image/favicon.ico" type="image/x-icon">
+  <title>App-By-DoubleDutch - Dashboard</title>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- <script src="js/highcharts.js"></script> -->
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+
+  <script src="js/KPI_Robin_InAppLeadsDistribution.js"></script>
+  <script src="js/KPI_Robin_InAppLeadTappingUsers.js"></script>
+
+  <script src="js/pullNums.js"></script>
+  
+
+  <style>
+    /* img.icon {width: 100px; height: 100px;} */
+    body {font-family: 'Helvetica Neue', Helvetica; font-weight: 200; padding: 10px;}
+    table {width: 100%; margin: 0 auto; border-collapse: collapse; border: 2px black solid; font: 12px sans-serif;}
+    td {border: 1px black solid; padding: 2px; text-align: left;}
+    th {border: 1px black solid; padding: 2px; font-weight: bold; text-align: left; background-color: black; color: white;}
+
+    div.header {width: 100%; text-align: center}
+    div.chart {width: 65%; height: 20%; margin: 0 auto;}
+    div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 5px; text-align: left}
+    div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px;  float: left}
+    div.linkbarcenter {width: 70%; padding-bottom: 30px; padding-top: 2px;  margin: 0 auto;}
+    div.linkbarright {width: 49%; padding-bottom: 30px; padding-top: 2px; float: right}
+    div.midbar {width: 100%; padding-bottom: 2px; padding-top: 2px;  float: left}
+  </style>
+
+</head>
+
+<body>
+  <!-- a href="../../">Back to Portal</a -->
+  <div class="header">
+    <img class="icon" src='image/logo.png'></img> 
+    <font face="Verdana"><h3>App-By-DoubleDutch - Dashboard</h3>
+
+  </div>
+
+  <hr> <!-- ====================================================================== -->
+
+  <!-- Chart: In-App Leads ON/OFF -->
+  <div id="inappleaddistribution" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeadsDistribution.csv"><font size="2">Download CSV</font></a>
+      <br>
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+  <!-- Chart: Tapping Users per Month -->
+  <div id="inappleadtappingusers" class="chart" width='100%' style="float: center"></div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeadTappingUsers.csv"><font size="2">Download CSV</font></a>
+      <br>
+  </div>
+
+  <br> <!-- ====================================================================== -->
+
+  <!-- In-App Leads List-->
+
+  <hr width="65%">
+  <div class="chart">
+      <br>
+      <u><font size="3">App-By-DoubleDutch Taps: </font></u>
+      <br>
+      <font size="2">This CSV provides the FULL list of ALL Attendees that tapped "App-By-DoubleDutch" and whether they completed the web form. </font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel.csv"><font size="2">Download CSV</font></a>
+      <br><br>
+  </div>
+
+  <!-- ====================================================================== -->
+
+  <!-- Chart: In-App Leads that completed web form -->
+
+  <hr width="65%">
+  <div class="chart">
+      <br>
+      <u><font size="3">App-By-DoubleDutch Taps to Marketo Web Form Completion: </font></u>
+      <br>
+      <b><font size="2" id="#forms"></font></b>
+      <br><br>
+      <font size="2">The following table provides the list of non-DoubleDutch Attendees that completed the web form AFTER tapping "App-By-DoubleDutch" in an event. </font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel_Marketo.csv"><font size="2">Download CSV</font></a>
+      <br><br>
+  </div>
+
+  <!-- Tabular Data: Just those that completed the web form -->
+  <div id="inappleads_marketo" class="chart" width='85%' style="float: center">
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Robin_InAppLeads_UserLevel_Marketo.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#inappleads_marketo").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <!-- ====================================================================== -->
+
+  <!-- Chart: Opportunities created from web form -->
+
+  <hr width="65%">
+  <div class="chart">
+      <br>
+      <u><font size="3">App-By-DoubleDutch Opportunities: </font></u>
+      <br>
+      <b><font size="2" id="#opps"></font></b>
+      <br><br>
+      <font size="2">The following table provides the list of opportunities that originated from in-app lead capture ("App-by-DoubleDutch").</font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_Opportunities.csv"><font size="2">Download CSV</font></a>
+      <br><br>
+  </div>
+
+  <!-- Tabular Data: Just those that completed the web form -->
+  <div id="inappleads_sfdc" class="chart" width='85%' style="float: center">
+  
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Robin_InAppLeads_Opportunities.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#inappleads_sfdc").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <!-- ====================================================================== -->
+
+</body>
+
+</html>
