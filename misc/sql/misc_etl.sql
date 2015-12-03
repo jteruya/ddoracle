@@ -61,6 +61,7 @@ SELECT
 ApplicationId, GlobalUserId, AppTypeId, BinaryVersion, DeviceOSVersion, MMM_Info, Created, CAST(EXTRACT(YEAR FROM Created) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM Created) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM Created) AS INT) AS YYYY_MM 
 FROM PUBLIC.V_Fact_Views_All 
 WHERE Identifier = 'activities' 
+AND Created <= CURRENT_DATE
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'3 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'3 months')||'-01 00:00:00' AS TIMESTAMP) --Past 3 months
 ;
 
