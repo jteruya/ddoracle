@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="author" content="#datadawgs">
+  <link rel="icon" href="image/favicon.ico" type="image/x-icon">
+  <title>Product Health - Chat Aggregates</title>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+
+  <style>
+    /* img.icon {width: 100px; height: 100px;} */
+    body {font-family: 'Helvetica Neue', Helvetica; font-weight: 200; padding: 10px;}
+    table {width: 85%; margin: 0 auto; border-collapse: collapse; border: 2px black solid; font: 12px sans-serif;}
+    td {border: 1px black solid; padding: 2px; text-align: left;}
+    th {border: 1px black solid; padding: 2px; font-weight: bold; text-align: left; background-color: black; color: white;}
+    tbody tr:nth-child(even) {background: #ccc;}
+    div.header {width: 100%; text-align: center}
+    div.chart {width: 85%; height: 20%; margin: 0 auto;}
+    div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 5px; text-align: left}
+    div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px;  float: left}
+    div.linkbarcenter {width: 70%; padding-bottom: 30px; padding-top: 2px;  margin: 0 auto;}
+    div.linkbarright {width: 49%; padding-bottom: 30px; padding-top: 2px; float: right}
+    div.midbar {width: 100%; padding-bottom: 2px; padding-top: 2px;  float: left}
+  </style>
+
+</head>
+
+<body>
+  <!-- a href="../../">Back to Portal</a -->
+  <div class="header">
+    <img class="icon" src='image/logo.png'></img> 
+    <font face="Verdana"><h3>Product Health - Chat Aggregates</h3>
+
+  </div>
+
+  <hr width="85%"> 
+  <!-- ====================================================================== -->
+
+  <div class="chart">
+      <font size="2">NOTE: All Attendees with "foo@doubledutch.me" email addresses are not included. </font>
+  </div>  
+
+  <!-- ====================================================================== -->    
+
+  <hr width="85%">
+  <div class="chart">
+      <br>
+      <u><font size="3">Event-Level Aggregate: </font></u>
+      <b><font size="2" id="#event"></font></b>
+      <br><br>
+      <font size="2">The following is a list of Events (US Server) that have used Direct Messages. 
+      <br>The additional CSV link below provides the same data, but includes count details. </font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Chat_Event_Detail.csv"><font size="2">Download Detailed CSV.</font></a>
+  </div><br>
+
+  <!-- Tabular Data: Event-Level Chat Agg -->
+  <div id="eventchatagg" class="chart" width='85%' style="float: center">
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Chat_Event.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#eventchatagg").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <br><!-- ================================================================================= -->
+
+  <hr width="85%">
+  <div class="chart">
+      <br>
+      <u><font size="3">User-Level Aggregate: </font></u>
+      <b><font size="2" id="#user"></font></b>
+      <br><br>
+      <font size="2">The following is a list of Events (US Server) that have Users that interacted with Direct Messages (including only taps on MenuItem selection). 
+
+      <br>The additional CSV link below provides the same data, but includes count details. </font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Chat_User_Detail.csv"><font size="2">Download Detailed CSV.</font></a>
+  </div><br>
+
+  <!-- Tabular Data: User-Level Chat Agg -->
+  <div id="userchatagg" class="chart" width='85%' style="float: center">
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Chat_User.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#userchatagg").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <br><!-- ================================================================================= -->
+
+
+  <hr width="85%">
+  <div class="chart">
+      <br>
+      <u><font size="3">Chat Bucket Aggregate: </font></u>
+      <b><font size="2" id="#bucket"></font></b>
+      <br><br>
+      <font size="2">The following is a list of Events (US Server) and buckets users based on their interaction with the Chat feature. 
+
+      <br>The additional CSV link below provides the same data presented below. </font>
+  </div>
+
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Chat_Split.csv"><font size="2">Download CSV.</font></a>
+  </div><br>
+
+  <!-- Tabular Data: User-Level Chat Agg -->
+  <div id="splitagg" class="chart" width='85%' style="float: center">
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Chat_Split.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#splitagg").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("tbody")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div>
+
+  <br><!-- ================================================================================= -->
+
+
+</body>
+
+</html>

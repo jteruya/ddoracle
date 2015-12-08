@@ -1,0 +1,9 @@
+ApplicationId,Start,End,Event,Total Rooms,% Rooms with any Messages,% Rooms with 2-way Conversation,% Rooms with 1-way Conversation,% Rooms with no Conversation,% Messages followed by View from Recipient,% Messages followed by Reply Sent,Rooms - with any Messages,Rooms - with 2-way Conversation,Rooms - with 1-way Conversation,Rooms - with no Conversation,Messages - Sent,Messages - followed by View from Recipient,Messages - followed by Reply Sent
+A56E9D6A-E4D3-410A-9A55-371F7980D81A,2015-12-08,2015-12-12,G and A Kickoff,5,60.00,0.00,60.00,40.00,0.00,0.00,3,0.00,3,2,5,0,0
+914BB4AA-C3FF-499D-A5A3-14B86A904F28,2015-12-08,2015-12-10,GE Power at PGI 2015,5,40.00,0.00,40.00,60.00,0.00,0.00,2,0.00,2,3,2,0,0
+962F96AC-2C70-4BE7-AE17-7AA977690080,2015-12-05,2015-12-08,FORWARD 15: Action Before Reaction,15,73.33,20.00,53.33,26.67,37.50,25.00,11,3,8,4,16,6,4
+469C88A3-DC38-426B-A8BB-1CD407F85A17,2015-11-16,2015-11-17,UBS Australasia Conference,28,64.29,10.71,53.57,35.71,14.29,14.29,18,3,15,10,28,4,4
+2F87D71C-79F0-4E30-82F2-23DF4AD9F771,2015-11-15,2015-11-17,the Property Insurance Report National Conference,149,51.68,17.45,34.23,48.32,58.44,38.96,77,26,51,72,154,90,60
+086DE2C6-D69F-4C97-81F6-1DB36873D297,2015-11-11,2015-11-16,2015 North American Forum on Family Planning,18,61.11,11.11,50.00,38.89,56.76,45.95,11,2,9,7,37,21,17
+3314EF89-E503-4BD1-B2FF-A4AF24B7D44A,2015-11-09,2015-11-11,Corporate Learning Week,63,58.73,4.76,53.97,41.27,25.53,6.38,37,3,34,26,47,12,3
+D958D6B4-6FE5-47BB-8807-AA999EC7D90A,2015-11-04,2015-11-06,Constellation's Connected Enterprise 2015,101,54.46,6.93,47.52,45.54,20.69,11.49,55,7,48,46,87,18,10
