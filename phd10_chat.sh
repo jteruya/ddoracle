@@ -55,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-# $run_sql_robin $domain_wd/sql/$etl.sql
+$run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -115,10 +115,10 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-# cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-# cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-# cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
 #  6  #
@@ -128,4 +128,4 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running cleanup_$etl.sql."
-# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+# NONE TO PERFORM
