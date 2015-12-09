@@ -1,6 +1,5 @@
 SELECT 
-CAST(EXTRACT(YEAR FROM FirstTap) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM FirstTap) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM FirstTap) AS INT) AS YYYY_MM,
-COUNT(*) AS CNT
-FROM dashboard.inapp_taps
-GROUP BY 1
+  "Year-Month",
+  "Users Tapped"
+FROM dashboard.inapp_user_agg 
 ORDER BY 1

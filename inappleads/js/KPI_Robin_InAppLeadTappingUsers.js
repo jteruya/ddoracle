@@ -20,7 +20,7 @@ inappleadtappingusers_options = {
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' attendees tapped App-By-DoubleDutch';
+    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + this.y + ' ' + this.series.name;
 
     return s;
     }
@@ -31,6 +31,9 @@ inappleadtappingusers_options = {
     align: 'center',
     layout: 'vertical'
   },
+  colors: [ 'rgba(238, 64, 53, 0.75)',
+            'rgba(3, 146, 207, 0.75)'
+          ],    
   xAxis: {
     title: {
       text: ''
@@ -40,12 +43,42 @@ inappleadtappingusers_options = {
       month: '%b %Y',
     }
   },
-  yAxis: {
-    min: 0, // Minimum start at 0 on y-axis
-    title: {
-      text: 'Bookmarks per User'
+  yAxis: [
+    {
+      min: 0, // Minimum start at 0 on y-axis
+      labels: {
+        style: {
+          color: 'rgba(238, 64, 53, 0.75)'
+        }
+      },
+      title: {
+        text: 'Taps per User',
+        style: {
+          color: 'rgba(238, 64, 53, 0.75)'
+        }
+      },
+      gridLineWidth: 2
+    },
+    {
+      min: 0, // Minimum start at 0 on y-axis
+      labels: {
+        format: '{value}%',
+        style: {
+          color: 'rgba(3, 146, 207, 0.75)',
+          fontWeight: "bold"
+        }
+      },
+      title: {
+        text: '% of Active Users Tapped',
+        style: {
+          color: 'rgba(3, 146, 207, 0.75)',
+          fontWeight: "bold"
+        }
+      },
+      opposite: true,
+      gridLineWidth: 2
     }
-  },
+  ],
   plotOptions: {
     series: {
       groupPadding: 0.1, // Spacing between x-axis categories
@@ -58,7 +91,7 @@ inappleadtappingusers_options = {
   series: []
 };
 
-$.get('csv/KPI_Robin_InAppLeadTappingUsers_transposed.csv', function(data) {
+$.get('csv/KPI_Robin_InAppLeadTappingUsers_COMB.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
 
@@ -73,7 +106,19 @@ $.get('csv/KPI_Robin_InAppLeadTappingUsers_transposed.csv', function(data) {
         name: '',
         data: []
       }
+
+      //Identify the Name of the Series
       series.name = items[0]
+
+      // Identify what Y-Axis to use
+      if (lineNo > 1) {
+        series.yAxis = 1
+        series.lineWidth = 4
+      }
+      else {
+        series.yAxis = 0
+      }
+
       $.each(items, function(itemNo, item) {
         if (itemNo > 0) {
           var year = parseInt(columns[itemNo].split('-')[0])

@@ -12,4 +12,5 @@ b.SF_Email_domain__c AS "Related Email Domain"
 FROM Integrations.Opportunity a
 LEFT JOIN Integrations.Account b ON a.SF_AccountId = b.SF_Id
 WHERE a.SF_CampaignId LIKE '701E0000000apGd%' OR a.SF_CampaignId LIKE '701E0000000alw9%'
-ORDER BY a.SF_CreatedDate DESC;
+ORDER BY a.SF_CreatedDate DESC
+LIMIT 10;

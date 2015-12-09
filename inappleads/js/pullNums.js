@@ -16,6 +16,24 @@ function getForms(){
     })
 }
 
+function getFormsTotal(){
+    var n = 0;
+
+    $.get('csv/KPI_Robin_InAppLeads_MarketoLeadsTotal_Count.csv', function(data) {
+      var lines = data.split('\n')
+      var linecnt = data.split('\n').length - 1;
+
+      $.each(lines, function(lineNo, line) {
+        if (lineNo == 1) {
+            console.log(line)
+            n = parseInt(line)
+            console.log(n)
+            document.getElementById("#formsTotal").innerHTML = n + ' total completed web forms to date.';
+          } 
+      })
+    })
+}
+
 function getOpps(){
     var n = 0;
 
@@ -48,4 +66,5 @@ function addLoadEvent(func) {
   }
 }
 addLoadEvent(getForms);
+addLoadEvent(getFormsTotal);
 addLoadEvent(getOpps);

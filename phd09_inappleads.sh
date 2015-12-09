@@ -25,16 +25,22 @@ domain_wd="$HOME/${wd}/${kpi_domain}"
 
 # Report fields
 kpi_inappleadsdistribution_report="KPI_Robin_InAppLeadsDistribution"
+kpi_inappleadsdistribution_table_report="KPI_Robin_InAppLeadsDistribution_Table"
+kpi_inappleadsdistribution_list_report="KPI_Robin_InAppLeadsDistribution_List"
 kpi_inappleads_userlevel_report="KPI_Robin_InAppLeads_UserLevel"
+kpi_inappleads_userlevel_table_report="KPI_Robin_InAppLeads_UserAgg"
 kpi_inappleads_userlevel_marketo_report="KPI_Robin_InAppLeads_UserLevel_Marketo"
 kpi_inappleads_tappingusers_report="KPI_Robin_InAppLeadTappingUsers"
+kpi_inappleads_tappingusers_PCT_report="KPI_Robin_InAppLeadTappingUsers_PCT"
+kpi_inappleads_tappingusers_report_comb="KPI_Robin_InAppLeadTappingUsers_COMB"
 kpi_inappleads_webform_count_report="KPI_Robin_InAppLeads_WebForm_Count"
 kpi_inappleads_opportunities_report="KPI_Robin_InAppLeads_Opportunities"
 kpi_inappleads_opportunities_count_report="KPI_Robin_InAppLeads_Opportunities_Count"
+kpi_inappleads_marketo_leads_total="KPI_Robin_InAppLeads_MarketoLeadsTotal"
+kpi_inappleads_marketo_leads_total_count="KPI_Robin_InAppLeads_MarketoLeadsTotal_Count"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
-# run_sql_alfred='psql -h 10.208.97.116 -p 5432 -U analytics -A -F"," etl -f '
 transpose="python $HOME/tools/transpose.py"
 index_insights_fill="python ${kpi_domain_wd}/index_insights_fill.py"
 email_reports_wd="$HOME/email_reports"
@@ -87,12 +93,18 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_inappleadsdistribution_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleadsdistribution_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleadsdistribution_table_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleadsdistribution_table_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleadsdistribution_list_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleadsdistribution_list_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_userlevel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_userlevel_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleads_userlevel_table_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_userlevel_table_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_userlevel_marketo_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_userlevel_marketo_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_tappingusers_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_tappingusers_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleads_tappingusers_PCT_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_tappingusers_PCT_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_webform_count_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_webform_count_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_opportunities_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_opportunities_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_inappleads_opportunities_count_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_opportunities_count_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleads_marketo_leads_total.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_marketo_leads_total.csv 
+$run_sql_robin $domain_wd/sql/$kpi_inappleads_marketo_leads_total_count.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_inappleads_marketo_leads_total_count.csv 
 
 # ====================================================================================================== ========== 3b
 echo "-------------------------------------------------------------------------------------------------"
@@ -101,6 +113,10 @@ echo "--------------------------------------------------------------------------
 
 # Transpose the Result Set CSV
 $transpose $domain_wd/csv/$kpi_inappleads_tappingusers_report.csv 
+$transpose $domain_wd/csv/$kpi_inappleads_tappingusers_PCT_report.csv 
+
+cat "${domain_wd}/csv/${kpi_inappleads_tappingusers_report}_transposed.csv" > $domain_wd/csv/$kpi_inappleads_tappingusers_report_comb.csv 
+tail -1 "${domain_wd}/csv/${kpi_inappleads_tappingusers_PCT_report}_transposed.csv"  >> $domain_wd/csv/$kpi_inappleads_tappingusers_report_comb.csv 
 
 # ====================================================================================================== ========== 4
 #  4  #
@@ -132,5 +148,5 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # echo "Running cleanup_$etl.sql."
-# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+# NONE TO PERFORM
 
