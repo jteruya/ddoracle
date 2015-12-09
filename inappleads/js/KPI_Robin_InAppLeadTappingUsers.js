@@ -16,7 +16,7 @@ inappleadtappingusers_options = {
     text: 'Attendees tapping App-By-DoubleDutch'
   },
   subtitle: {
-    text: '(for the past 390 days)'
+    text: '(for the past 13 months)'
   },
   tooltip: {
     formatter: function () {
