@@ -1,5 +1,7 @@
-SELECT InApp_Ind, YYYY_MM, ROUND(100 * CAST(CNT AS NUMERIC) / CAST(SUM(CNT) OVER (PARTITION BY YYYY_MM) AS NUMERIC),2) AS PCT_CNT FROM (
-SELECT YYYY_MM, InApp_Ind, COUNT(*) AS CNT
+SELECT 
+  YYYY_MM AS "Year-Month", 
+  COUNT(*) AS "Total Events", 
+  CAST(ROUND(100 * CAST(SUM(CASE WHEN InApp_Ind = 'ON' THEN 1 ELSE 0 END) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC),2) AS TEXT)||'%  ('||CAST(SUM(CASE WHEN InApp_Ind = 'ON' THEN 1 ELSE 0 END) AS TEXT)||' events)' AS "Events w/ App-By-DoubleDutch ON"
 FROM (
         SELECT 
           a.ApplicationId, 
@@ -12,5 +14,6 @@ FROM (
         AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents)
         AND StartDate <= CURRENT_DATE --Only Events that have started in past 13 months
         AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
-) t GROUP BY 1,2
-) t ORDER BY 1,2;
+) t 
+GROUP BY 1
+ORDER BY 1 DESC;

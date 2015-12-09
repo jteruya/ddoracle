@@ -25,6 +25,7 @@
     table {width: 100%; margin: 0 auto; border-collapse: collapse; border: 2px black solid; font: 12px sans-serif;}
     td {border: 1px black solid; padding: 2px; text-align: left;}
     th {border: 1px black solid; padding: 2px; font-weight: bold; text-align: left; background-color: black; color: white;}
+    tbody tr:nth-child(even) {background: #ccc;}
 
     div.header {width: 100%; text-align: center}
     div.chart {width: 65%; height: 20%; margin: 0 auto;}
@@ -50,13 +51,53 @@
   <!-- Chart: In-App Leads ON/OFF -->
   <div id="inappleaddistribution" class="chart" width='100%' style="float: center"></div>
 
-  <!-- CSV Link -->
+  <br> <!-- ====================================================================== -->
+
+  <!-- Tabular Data: Monthly Breakdown Event Funnel -->
+  <div id="inappleaddistribution_table" class="chart" width='85%' style="float: center">
+  
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Robin_InAppLeadsDistribution_Table.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
+
+          var container = d3.select("#inappleaddistribution_table").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div><br>
+
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_InAppLeadsDistribution.csv"><font size="2">Download CSV</font></a>
-      <br>
+      <font size="2">The CSV provides the full list of events (started in past 13 months) and whether the App-By-DoubleDutch Feature was ON/OFF. </font>
   </div>
 
-  <br> <!-- ====================================================================== -->
+  <!-- CSV Link -->
+  <div class="chart">
+      <a target="_blank" href="csv/KPI_Robin_InAppLeadsDistribution_List.csv"><font size="2">Download CSV</font></a>
+      <br><br>
+  </div>
+
+  <hr width="65%">
+
+  <!-- ====================================================================== -->
 
   <!-- Chart: Tapping Users per Month -->
   <div id="inappleadtappingusers" class="chart" width='100%' style="float: center"></div>
@@ -69,19 +110,41 @@
 
   <br> <!-- ====================================================================== -->
 
-  <!-- In-App Leads List-->
+  <!-- Tabular Data: Monthly Breakdown User Funnel -->
+  <div id="inappleadusers_table" class="chart" width='85%' style="float: center">
+  
+  <script type="text/javascript"charset="utf-8">
+      d3.text("csv/KPI_Robin_InAppLeads_UserAgg.csv", function(data) {
+          var parsedCSV = d3.csv.parseRows(data);
 
-  <hr width="65%">
-  <div class="chart">
-      <br>
-      <u><font size="3">App-By-DoubleDutch Taps: </font></u>
-      <br>
-      <font size="2">This CSV provides the FULL list of ALL Attendees that tapped "App-By-DoubleDutch" and whether they completed the web form. </font>
-  </div>
+          var container = d3.select("#inappleadusers_table").append("table");
+
+          // Header
+          container.append("thead")
+                   .append("tr")
+                   .selectAll("th")
+                   .data(parsedCSV[0])
+                   .enter().append("th")
+                   .text(function(d) {
+                      return d;
+                   });
+
+          // Table Data
+          container.append("tbody")
+                   .selectAll("tr").data(parsedCSV.slice(1))
+                   .enter().append("tr")
+                   .selectAll("td")
+                   .data(function(d){return d;})
+                   .enter().append("td")
+                   .text(function(d){return d;})
+
+      });
+  </script>
+  </div><br>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel.csv"><font size="2">List of <b>ALL</b> Attendees that tapped "App-By-DoubleDutch" and whether they completed the web form. </font></a>
       <br><br>
   </div>
 
@@ -94,16 +157,23 @@
       <br>
       <u><font size="3">App-By-DoubleDutch Taps to Marketo Web Form Completion: </font></u>
       <br>
-      <b><font size="2" id="#forms"></font></b>
+      <li><b><font size="2" id="#forms"></font></b><br>
+      <li><b><font size="2" id="#formsTotal"></font></b>
       <br><br>
-      <font size="2">The following table provides the list of non-DoubleDutch Attendees that completed the web form AFTER tapping "App-By-DoubleDutch" in an event. </font>
   </div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel_Marketo.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_UserLevel_Marketo.csv"><font size="2">List of App-By-DoubleDutch Taps TIED to Marketo Web Form completions</font></a>
+      <br>
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_MarketoLeadsTotal.csv"><font size="2">List of <b>ALL</b> Marketo Web Form completions</font></a>
       <br><br>
   </div>
+
+  <div class="chart">
+      <font size="2">The following table provides the <b>10 latest</b> non-DoubleDutch Attendees that completed the web form AFTER tapping "App-By-DoubleDutch" in an event. </font>
+  </div>
+  <br>
 
   <!-- Tabular Data: Just those that completed the web form -->
   <div id="inappleads_marketo" class="chart" width='85%' style="float: center">
@@ -145,16 +215,19 @@
       <br>
       <u><font size="3">App-By-DoubleDutch Opportunities: </font></u>
       <br>
-      <b><font size="2" id="#opps"></font></b>
+      <li><b><font size="2" id="#opps"></font></b>
       <br><br>
-      <font size="2">The following table provides the list of opportunities that originated from in-app lead capture ("App-by-DoubleDutch").</font>
   </div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_InAppLeads_Opportunities.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_InAppLeads_Opportunities.csv"><font size="2">List of <b>ALL</b> Opportunities tied to the Product Lead Generation Campaign.</font></a>
       <br><br>
   </div>
+
+  <div class="chart">
+      <font size="2">The following table provides the <b>10 latest</b> opportunities that originated from in-app lead capture ("App-by-DoubleDutch").</font>
+  </div><br>
 
   <!-- Tabular Data: Just those that completed the web form -->
   <div id="inappleads_sfdc" class="chart" width='85%' style="float: center">

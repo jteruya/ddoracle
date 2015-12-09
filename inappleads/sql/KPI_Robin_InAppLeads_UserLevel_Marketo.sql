@@ -13,3 +13,4 @@ JOIN dashboard.inapp_marketo_leads marketo ON LOWER(gud.EmailAddress) = LOWER(ma
 WHERE marketo.Email NOT LIKE '%doubledutch.me'
 AND marketo.LatestFormFillDate - base.LastTap > INTERVAL'0 seconds'
 ORDER BY TO_CHAR(marketo.LatestFormFillDate,'YYYY-MM-DD HH24:MI:SS') DESC
+LIMIT 10;
