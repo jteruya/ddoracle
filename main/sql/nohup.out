@@ -1,0 +1,8 @@
+DROP TABLE
+SELECT 63475113
+Cancel request sent
+Cancel request sent
+Cancel request sent
+Cancel request sent
+Cancel request sent
+psql:main_etl.sql:18: SSL SYSCALL error: Operation timed out
