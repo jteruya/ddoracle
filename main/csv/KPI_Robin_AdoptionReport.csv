@@ -1,21 +1,19 @@
 eventtype,yyyy_mm,pct_adoption
-All Events,2014-09,59.0000
-All Events,2014-10,60.0000
-All Events,2014-11,60.0000
-All Events,2014-12,69.0000
-All Events,2015-01,69.0000
+All Events,2014-11,56.0000
+All Events,2014-12,68.0000
+All Events,2015-01,68.0000
 All Events,2015-02,71.0000
-All Events,2015-03,65.0000
-All Events,2015-04,64.0000
+All Events,2015-03,66.0000
+All Events,2015-04,63.0000
 All Events,2015-05,66.0000
 All Events,2015-06,64.0000
-All Events,2015-07,67.0000
+All Events,2015-07,65.0000
 All Events,2015-08,67.0000
-All Events,2015-09,59.0000
-All Events,2015-10,56.0000
-Conference,2014-09,50.0000
-Conference,2014-10,58.0000
-Conference,2014-11,54.0000
+All Events,2015-09,58.0000
+All Events,2015-10,61.0000
+All Events,2015-11,63.0000
+All Events,2015-12,68.0000
+Conference,2014-11,46.0000
 Conference,2014-12,63.0000
 Conference,2015-01,64.0000
 Conference,2015-02,59.0000
@@ -23,42 +21,42 @@ Conference,2015-03,56.0000
 Conference,2015-04,52.0000
 Conference,2015-05,58.0000
 Conference,2015-06,60.0000
-Conference,2015-07,61.0000
+Conference,2015-07,62.0000
 Conference,2015-08,59.0000
-Conference,2015-09,53.0000
-Conference,2015-10,50.0000
-Corporate External,2014-09,64.0000
-Corporate External,2014-10,60.0000
-Corporate External,2014-11,56.0000
+Conference,2015-09,52.0000
+Conference,2015-10,56.0000
+Conference,2015-11,57.0000
+Conference,2015-12,52.0000
+Corporate External,2014-11,50.0000
 Corporate External,2014-12,70.0000
-Corporate External,2015-01,60.0000
+Corporate External,2015-01,61.0000
 Corporate External,2015-02,65.0000
 Corporate External,2015-03,70.0000
 Corporate External,2015-04,66.0000
 Corporate External,2015-05,64.0000
-Corporate External,2015-06,66.0000
-Corporate External,2015-07,62.0000
-Corporate External,2015-08,57.0000
-Corporate External,2015-09,57.0000
-Corporate External,2015-10,56.0000
-Corporate Internal,2014-09,69.0000
-Corporate Internal,2014-10,60.0000
-Corporate Internal,2014-11,75.0000
-Corporate Internal,2014-12,62.0000
-Corporate Internal,2015-01,73.0000
+Corporate External,2015-06,67.0000
+Corporate External,2015-07,63.0000
+Corporate External,2015-08,54.0000
+Corporate External,2015-09,56.0000
+Corporate External,2015-10,62.0000
+Corporate External,2015-11,59.0000
+Corporate External,2015-12,60.0000
+Corporate Internal,2014-11,79.0000
+Corporate Internal,2014-12,61.0000
+Corporate Internal,2015-01,71.0000
 Corporate Internal,2015-02,72.0000
-Corporate Internal,2015-03,68.0000
+Corporate Internal,2015-03,69.0000
 Corporate Internal,2015-04,66.0000
 Corporate Internal,2015-05,66.0000
-Corporate Internal,2015-06,62.0000
-Corporate Internal,2015-07,66.0000
-Corporate Internal,2015-08,70.0000
-Corporate Internal,2015-09,65.0000
-Corporate Internal,2015-10,58.0000
-Expo,2014-09,28.0000
-Expo,2014-10,77.0000
+Corporate Internal,2015-06,63.0000
+Corporate Internal,2015-07,65.0000
+Corporate Internal,2015-08,69.0000
+Corporate Internal,2015-09,64.0000
+Corporate Internal,2015-10,65.0000
+Corporate Internal,2015-11,65.0000
+Corporate Internal,2015-12,62.0000
 Expo,2014-11,70.0000
-Expo,2014-12,69.0000
+Expo,2014-12,70.0000
 Expo,2015-01,47.0000
 Expo,2015-02,45.0000
 Expo,2015-03,50.0000
@@ -67,5 +65,7 @@ Expo,2015-05,55.0000
 Expo,2015-06,39.0000
 Expo,2015-07,25.0000
 Expo,2015-08,44.0000
-Expo,2015-09,27.0000
-Expo,2015-10,26.0000
+Expo,2015-09,31.0000
+Expo,2015-10,32.0000
+Expo,2015-11,17.0000
+Expo,2015-12,40.0000
