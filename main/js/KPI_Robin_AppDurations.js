@@ -16,7 +16,7 @@ appdurations_options = {
     text: 'Per User, In-App Duration by week'
   },
   subtitle: {
-    text: '(Median across User In-App Durations, past 8 weeks)'
+    text: '(Median across User In-App Durations, past 16 weeks)'
   },
   tooltip: {
     formatter: function () {
