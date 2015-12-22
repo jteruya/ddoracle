@@ -18,20 +18,33 @@ JOIN AuthDB_IS_Users iu ON base.ApplicationId = iu.ApplicationId AND base.Global
 
 --Get all Exhibitor Item Views
 CREATE TEMPORARY TABLE kpi_social_metrics_exhibitorview_users TABLESPACE FastStorage AS
---OldMetrics definition
-SELECT DISTINCT ApplicationId, GlobalUserId
-FROM PUBLIC.V_Fact_Views_All 
+--Robin Historical
+SELECT DISTINCT UPPER(Application_Id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId
+FROM PUBLIC.Fact_Views_Old
+WHERE Created < '2015-04-24 00:00:00'
+AND (Identifier = 'item' AND Metadata ->> 'type' = 'exhibitor') OR (Identifier IN ('exhibitorprofile'))
+AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+UNION
+--Alfred
+SELECT DISTINCT UPPER(Application_Id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId
+FROM PUBLIC.Fact_Views
+WHERE Created >= '2015-04-24 00:00:00'
+AND (Identifier = 'item' AND Metadata ->> 'type' = 'exhibitor') OR (Identifier IN ('exhibitorprofile'))
+AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
+UNION 
+--oldMetrics Live
+SELECT DISTINCT UPPER(Application_Id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId
+FROM PUBLIC.Fact_Views_New
 WHERE (Identifier = 'item' AND Metadata ->> 'type' = 'exhibitor') OR (Identifier IN ('exhibitorprofile'))
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 UNION
---NewMetrics definition
-SELECT DISTINCT ApplicationId, GlobalUserId
-FROM PUBLIC.V_Fact_Views_All 
-WHERE SRC = 'New_Metrics' AND Identifier = 'item'
+--newMetrics Live
+SELECT DISTINCT UPPER(Application_Id) AS ApplicationId, UPPER(Global_User_Id) AS GlobalUserId
+FROM PUBLIC.Fact_Views_Live
+WHERE Identifier = 'item'
 AND CAST(Metadata ->> 'ListId' AS INT) IN (SELECT t.TopicId FROM Ratings_Topic t WHERE t.ListTypeId = 3)
 AND Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
-AND ApplicationId IS NOT NULL AND GlobalUserId IS NOT NULL;
-;
+AND Application_Id IS NOT NULL AND Global_User_Id IS NOT NULL;
 
 CREATE INDEX ndx_kpi_social_metrics_exhibitorview_users ON kpi_social_metrics_exhibitorview_users (ApplicationId,GlobalUserId) TABLESPACE FastStorage;
 
