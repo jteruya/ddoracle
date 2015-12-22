@@ -16,7 +16,7 @@ sessiondurations_options = {
     text: 'Session Durations by week'
   },
   subtitle: {
-    text: '(Median across all sessions, past 8 weeks)'
+    text: '(Median across all sessions, past 16 weeks)'
   },
   tooltip: {
     formatter: function () {
