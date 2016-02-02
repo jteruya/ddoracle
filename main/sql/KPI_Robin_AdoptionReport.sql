@@ -1,3 +1,4 @@
+EXPLAIN
 SELECT EventType, YYYY_MM, PCT_Adoption 
 
 FROM (
@@ -24,7 +25,7 @@ AND u.IsDisabled = 0 --Only existing Attendees in the list
 AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Filter out Test Events
 
 ) t 
-LEFT JOIN kevin.sf_implementation__c sfdc ON t.ApplicationId = sfdc.sf_event_id_cms__c
+LEFT JOIN Integrations.implementation__c sfdc ON t.ApplicationId = sfdc.sf_event_id_cms__c
 WHERE StartDate <= CURRENT_DATE --Only Events that have already started
 AND StartDate >= CURRENT_DATE - INTERVAL'13 months'
 GROUP BY 1,2,3,4
