@@ -22,22 +22,26 @@ CREATE TABLE dashboard.Chat_Dim_Rooms AS
 SELECT 
   ApplicationId,
   ChannelId, 
+  Type,
   CASE WHEN DD_Members >= 1 THEN 1 ELSE 0 END AS DD_Ind 
 FROM (
         SELECT 
           ApplicationId,
           ChannelId, 
+          Type,
           SUM(DD_Ind) AS DD_Members 
         FROM (
                 SELECT 
                   du.ApplicationId,
                   rm.ChannelId, 
                   rm.UserId, 
-                  COALESCE(du.DD_Ind,0) AS DD_Ind
+                  COALESCE(du.DD_Ind,0) AS DD_Ind,
+                  rm2.Type
                 FROM channels.Members rm
+                JOIN channels.Rooms rm2 ON rm.ChannelId = rm2.Id
                 JOIN dashboard.Chat_Dim_Users du ON rm.UserId = du.UserId
         ) t 
-        GROUP BY 1,2
+        GROUP BY 1,2,3
 ) t;
 
 --====================================================================================================
@@ -161,6 +165,7 @@ WHERE DD_Ind = 0; --Filter out DD
 --Overall Messages + Flagging for Views (Direct Messages)
 DROP TABLE IF EXISTS dashboard.Chat_Fact_MessagesFlagged;
 CREATE TABLE dashboard.Chat_Fact_MessagesFlagged AS
+EXPLAIN
 SELECT
   ms.ApplicationId,
   ms.ChannelId, 
