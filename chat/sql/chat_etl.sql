@@ -165,7 +165,6 @@ WHERE DD_Ind = 0; --Filter out DD
 --Overall Messages + Flagging for Views (Direct Messages)
 DROP TABLE IF EXISTS dashboard.Chat_Fact_MessagesFlagged;
 CREATE TABLE dashboard.Chat_Fact_MessagesFlagged AS
-EXPLAIN
 SELECT
   ms.ApplicationId,
   ms.ChannelId, 
