@@ -25,6 +25,6 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-# cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-# cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
