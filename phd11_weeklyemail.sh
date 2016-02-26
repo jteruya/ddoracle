@@ -28,10 +28,10 @@ cat $domain_wd/sql/appsessions_weeklevel.sql | $ROBIN
 cat $domain_wd/sql/appsessions_eventtypelevel.sql | $ROBIN
 
 # Generate JSON Data 
-python $wd_domain/columncharttemplate.py adoption_weeklevel.json Adoption adoption_eventtypelevel.json adoptioncontainer.js "Adoption % Trend" "By Week (Closed Reg Events Only)" "Adoption %" "#7CB5EC"
-python $wd_domain/columncharttemplate.py activeusers_weeklevel.json "Active Users" activeusers_eventtypelevel.json activeuserscontainer.js "Active Users Count Trend" "By Week (All Events)" "Active Users Count" "#90ED7D"
-python $wd_domain/columncharttemplate.py events_weeklevel.json "Events" events_eventtypelevel.json eventscontainer.js "Event Count Trend" "By Week (All Events)" "Event Count" "#F7A35C"
-python $wd_domain/columncharttemplate.py appsessions_weeklevel.json "App Sessions" appsessions_eventtypelevel.json appsessionscontainer.js "App Session Count" "By Week (All Events)" "App Session Count" "#8085E9"
+python $domain_wd/columncharttemplate.py adoption_weeklevel.json Adoption adoption_eventtypelevel.json adoptioncontainer.js "Adoption % Trend" "By Week (Closed Reg Events Only)" "Adoption %" "#7CB5EC"
+python $domain_wd/columncharttemplate.py activeusers_weeklevel.json "Active Users" activeusers_eventtypelevel.json activeuserscontainer.js "Active Users Count Trend" "By Week (All Events)" "Active Users Count" "#90ED7D"
+python $domain_wd/columncharttemplate.py events_weeklevel.json "Events" events_eventtypelevel.json eventscontainer.js "Event Count Trend" "By Week (All Events)" "Event Count" "#F7A35C"
+python $domain_wd/columncharttemplate.py appsessions_weeklevel.json "App Sessions" appsessions_eventtypelevel.json appsessionscontainer.js "App Session Count" "By Week (All Events)" "App Session Count" "#8085E9"
 
 # Copy to Web Server
 cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
