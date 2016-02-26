@@ -6,7 +6,7 @@
 \a
 \f
 -- \o /var/www/html/secondside/workspace/json/level_1.json
-\o /Users/jonathanteruya/repo/dashboards/adoption/json/adoption_weeklevel.json
+\o /home/datadawgs/oracle/weeklyemail/json/adoption_weeklevel.json
 
 select
   json_agg(row_to_json(s)) "data"
@@ -24,7 +24,7 @@ from
 
 \t 
 \f ','
-\o /Users/jonathanteruya/repo/dashboards/adoption/csv/adoption_weeklevel.csv
+\o /home/datadawgs/oracle/weeklyemail/csv/adoption_weeklevel.csv
 
 select
    week_starting as "Week Of",
