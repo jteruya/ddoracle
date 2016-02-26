@@ -27,7 +27,7 @@ order by 1,2,3;
 \a
 \f
 -- \o /var/www/html/secondside/workspace/json/level_2.json
-\o /Users/jonathanteruya/repo/dashboards/adoption/json/adoption_eventtypelevel.json
+\o /home/datadawgs/oracle/weeklyemail/json/adoption_eventtypelevel.json
 
 select
   '[' || string_agg(series,',') || ']' series
@@ -47,7 +47,7 @@ from
 
 \t
 \f ','
-\o /Users/jonathanteruya/repo/dashboards/adoption/csv/adoption_eventtypelevel.csv
+\o /home/datadawgs/oracle/weeklyemail/csv/adoption_eventtypelevel.csv
 
 select name as "Week Of"
      , eventtype as "Event Type"
