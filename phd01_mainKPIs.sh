@@ -55,7 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
-# $run_sql_robin $domain_wd/sql/$etl.sql 
+$run_sql_robin $domain_wd/sql/$etl.sql 
 
 # ====================================================================================================== ========== 2
 #  2  #
@@ -83,8 +83,8 @@ echo "--------------------------------------------------------------------------
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-# $run_sql_robin $domain_wd/sql/$kpi_adoption_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_adoption_report.csv 
-# $run_sql_robin $domain_wd/sql/$kpi_sessionbucketing_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionbucketing_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_adoption_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_adoption_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_sessionbucketing_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessionbucketing_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_sessiondurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_sessiondurations_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_appdurations_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_appdurations_report.csv 
 
@@ -126,4 +126,4 @@ echo "CLEANUP - Clean the tables created via ETL ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running cleanup_$etl.sql."
-# $run_sql_robin $domain_wd/sql/cleanup_$etl.sql
+$run_sql_robin $domain_wd/sql/cleanup_$etl.sql
