@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Base fields
-kpi_domain="weeklyEmail"
+kpi_domain="weeklyemail"
 wd="oracle"
 etl="${kpi_domain}_etl"
 domain_wd="$HOME/${wd}/${kpi_domain}"
