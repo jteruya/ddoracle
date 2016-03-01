@@ -1,10 +1,7 @@
 #!/usr/bin/python
-
 import sys
-
 # wd = '/var/www/html/secondside/workspace'
-wd = '/Users/jonathanteruya/repo/dashboards/adoption'
-
+wd = '/home/datadawgs/oracle/weeklyemail'
 level1_file=sys.argv[1]
 level1_series = sys.argv[2]
 level2_file=sys.argv[3]
@@ -13,7 +10,6 @@ title = sys.argv[5]
 subtitle = sys.argv[6]
 yaxistitle = sys.argv[7]
 color = sys.argv[8]
-
 template = '''
 $(function () {
     // Create the chart
@@ -26,7 +22,7 @@ $(function () {
         },
          subtitle: {
             text: '%s'
-        }, 
+        },
         xAxis: {
             type: 'category'
         },
@@ -34,7 +30,6 @@ $(function () {
             title: {
                 text: '%s'
             }
-
         },
         colors: ['%s'],
         legend: {
@@ -48,13 +43,9 @@ $(function () {
                 }
             }
         },
-
-        
-
         tooltip: {
             headerFormat: '<span style="font-size:11px">{series.name}</span><br>'
         },
-
         series: [{
             name: "%s",
             colorByPoint: false,
@@ -68,14 +59,11 @@ $(function () {
     });
 });
 '''
-
 #with open(wd + '/json/level_1.json') as d:
 with open(wd + '/json/' + level1_file) as d:
   data = d.read()
-
 with open(wd + '/json/' + level2_file) as s:
   series = s.read()
-
 with open(wd + '/js/' + outputfile,'w') as i:
   i.write(template % (outputfile.split('.', 1)[0],title,subtitle,yaxistitle,color,level1_series,data,series))
 

@@ -6,7 +6,7 @@ select
    'Week of ' || spine.week_starting "name",
    'Week of ' || spine.week_starting id,
     spine.eventtype,
-    sum(case when usersactive is not null then usersactive else 0 end) y
+    coalesce(round(100*sum(adoption*registrants)/sum(registrants),2),0) y
 from (select week.week_starting
            , eventtype.eventtype  
       from (select distinct week_starting from dashboard.weekly_adoption_events) week
@@ -14,8 +14,10 @@ from (select week.week_starting
       on 1 = 1) spine 
 left join (select week_starting
                 , case when eventtype = '' then '_Unknown' else trim(split_part(eventtype,'(',1)) end eventtype
-                , usersactive
-           from dashboard.weekly_adoption_events) events 
+                , adoption
+                , registrants
+           from dashboard.weekly_adoption_events
+           where openevent = 0) events 
 on spine.eventtype = events.eventtype and spine.week_starting = events.week_starting
 group by 1,2,3
 order by 1,2,3;  
@@ -25,7 +27,7 @@ order by 1,2,3;
 \a
 \f
 -- \o /var/www/html/secondside/workspace/json/level_2.json
-\o /Users/jonathanteruya/repo/dashboards/adoption/json/activeusers_eventtypelevel.json
+\o /home/datadawgs/oracle/weeklyemail/json/adoption_eventtypelevel.json
 
 select
   '[' || string_agg(series,',') || ']' series
@@ -45,9 +47,10 @@ from
 
 \t
 \f ','
-\o /Users/jonathanteruya/repo/dashboards/adoption/csv/activeusers_eventtypelevel.csv
+\o /home/datadawgs/oracle/weeklyemail/csv/adoption_eventtypelevel.csv
 
 select name as "Week Of"
      , eventtype as "Event Type"
-     , y as "Active Users Count"
+     , y as "Adoption %"
 from eventtypelevel;
+

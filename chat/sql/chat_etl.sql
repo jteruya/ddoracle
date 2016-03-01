@@ -22,22 +22,26 @@ CREATE TABLE dashboard.Chat_Dim_Rooms AS
 SELECT 
   ApplicationId,
   ChannelId, 
+  Type,
   CASE WHEN DD_Members >= 1 THEN 1 ELSE 0 END AS DD_Ind 
 FROM (
         SELECT 
           ApplicationId,
           ChannelId, 
+          Type,
           SUM(DD_Ind) AS DD_Members 
         FROM (
                 SELECT 
                   du.ApplicationId,
                   rm.ChannelId, 
                   rm.UserId, 
-                  COALESCE(du.DD_Ind,0) AS DD_Ind
+                  COALESCE(du.DD_Ind,0) AS DD_Ind,
+                  rm2.Type
                 FROM channels.Members rm
+                JOIN channels.Rooms rm2 ON rm.ChannelId = rm2.Id
                 JOIN dashboard.Chat_Dim_Users du ON rm.UserId = du.UserId
         ) t 
-        GROUP BY 1,2
+        GROUP BY 1,2,3
 ) t;
 
 --====================================================================================================
@@ -98,7 +102,7 @@ AND e.ApplicationId IN (SELECT ApplicationId FROM dashboard.Chat_Dim_Events);
 
 --====================================================================================================
 
---Conversations Recorded
+--Conversations Recorded (Direct Messages ONLY)
 DROP TABLE IF EXISTS dashboard.Chat_Agg_Conversations;
 CREATE TABLE dashboard.Chat_Agg_Conversations AS
 SELECT 
@@ -112,7 +116,7 @@ SELECT
     WHEN COALESCE(agg.Messagers,0) = 1 THEN 'One-Side Conversation' 
     WHEN COALESCE(agg.Messagers,0) = 0 THEN 'Room Created - No Conversation' 
   END AS RoomType
-FROM (SELECT DISTINCT ApplicationId, ChannelId, DD_Ind FROM dashboard.Chat_Dim_Rooms) rm --Base set of Rooms
+FROM (SELECT DISTINCT ApplicationId, ChannelId, DD_Ind FROM dashboard.Chat_Dim_Rooms WHERE Type = 'GROUP') rm --Base set of Rooms
 --Identify how many messages were sent and how many users sent messages in each room
 LEFT JOIN (SELECT ChannelId, COUNT(*) AS Messages, COUNT(DISTINCT S_UserId) AS Messagers FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0 GROUP BY 1) agg ON rm.ChannelId = agg.ChannelId
 ORDER BY 1,2,3;
@@ -158,7 +162,7 @@ WHERE DD_Ind = 0; --Filter out DD
 
 --====================================================================================================
 
---Overall Messages + Flagging for Views
+--Overall Messages + Flagging for Views (Direct Messages)
 DROP TABLE IF EXISTS dashboard.Chat_Fact_MessagesFlagged;
 CREATE TABLE dashboard.Chat_Fact_MessagesFlagged AS
 SELECT
@@ -175,12 +179,12 @@ FROM dashboard.Chat_Fact_MessagesSent ms
 LEFT JOIN dashboard.Chat_Agg_RoomView v ON ms.ChannelId = v.ChannelId AND ms.S_UserId <> v.UserId 
 LEFT JOIN dashboard.Chat_Agg_SendMessage sm ON ms.ChannelId = sm.ChannelId AND ms.S_UserId <> sm.UserId
 WHERE ms.MessageSent_Bug = 0
-AND ms.ChannelId IN (SELECT ChannelId FROM dashboard.Chat_Dim_Rooms WHERE DD_INd = 0) --Filter out rooms with any DD users
+AND ms.ChannelId IN (SELECT ChannelId FROM dashboard.Chat_Dim_Rooms WHERE DD_INd = 0 AND Type = 'GROUP') --Filter out rooms with any DD users
 ORDER BY ms.ApplicationId, ms.ChannelId, ms.Created;
 
 --====================================================================================================
 
---Event-Level Aggregate for Messages
+--Event-Level Aggregate for Messages (Direct Messages)
 DROP TABLE IF EXISTS dashboard.Chat_Agg_Event;
 CREATE TABLE dashboard.Chat_Agg_Event AS
 SELECT 
@@ -212,7 +216,7 @@ GROUP BY base.ApplicationId, app.Name, rm.CNT, rm_2conv.CNT, rm_1conv.CNT, rm_0c
 
 --====================================================================================================
 
---User-Level Aggregate for Messages
+--User-Level Aggregate for Messages (Direct Messages)
 DROP TABLE IF EXISTS dashboard.Chat_Agg_User;
 CREATE TABLE dashboard.Chat_Agg_User AS
 SELECT 
