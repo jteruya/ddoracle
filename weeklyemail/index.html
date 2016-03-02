@@ -1,5 +1,10 @@
 <html>
 <head>
+
+<meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="932800794663-85g9jdabeduo5h3g33qcv9rtbs2onovd.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/modules/data.js"></script>
@@ -50,6 +55,23 @@ var trackOutboundLink = function(url) {
 
 </head>
 <body>
+
+  <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <script>
+      function onSignIn(googleUser) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+        console.log("Name: " + profile.getName());
+        console.log("Image URL: " + profile.getImageUrl());
+        console.log("Email: " + profile.getEmail());
+
+        // The ID token you need to pass to your backend:
+        var id_token = googleUser.getAuthResponse().id_token;
+        console.log("ID Token: " + id_token);
+      };
+    </script>
+
   <!-- a href="../../">Back to Portal</a -->
   <div class="header">
     <img class="icon" style='height:15%' src='image/dd-dawgs-logo.png'></img> 
