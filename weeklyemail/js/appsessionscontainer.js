@@ -6,7 +6,7 @@ $(function () {
             type: 'column'
         },
         title: {
-            text: 'App Session Count'
+            text: 'App Session Count Trend'
         },
          subtitle: {
             text: 'By Week (All Events)'
