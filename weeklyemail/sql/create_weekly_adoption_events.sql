@@ -20,3 +20,7 @@ join (select wk.*
       on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek) w
 on e.startdate = w.date
 and e.enddate <= :END
+left join eventcube.testevents t
+on e.applicationid = t.applicationid
+where t.applicationid is null
+;

@@ -40,8 +40,8 @@ var trackOutboundLink = function(url) {
   <style>
     /* img.icon {width: 100px; height: 100px;} */
     div.header {width: 100%; text-align: center}
-    div.chart {width: 65%; height: 20%; margin: 0 auto;}
-    div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 5px; text-align: left}
+    div.chart {width: 90%; margin: 0 auto;}
+    div.textright {width: 33%; padding-bottom: 10px; padding-top: 10px; padding-right: 10px; padding-left: 100px; text-align: left}
     div.linkbarleft {width: 50%; padding-left: 2px; padding-bottom: 5px; padding-top: 2px;  float: left}
     div.linkbarcenter {width: 70%; padding-bottom: 30px; padding-top: 2px;  margin: 0 auto;}
     div.linkbarright {width: 49%; padding-bottom: 30px; padding-top: 2px; float: right}
@@ -54,13 +54,13 @@ var trackOutboundLink = function(url) {
   <div class="header">
     <img class="icon" style='height:15%' src='image/dd-dawgs-logo.png'></img> 
     <font face="Verdana"><h3>Weekly Adoption Report (US Events Only)</h3>
-    <!-- <a href="https://doubledutch.atlassian.net/wiki/display/PROD/Social">Confluence Documentation</a><br></font> -->
-
+    <a href="https://doubledutch.atlassian.net/wiki/display/PROD/Datadawgs+Reporting">Confluence Documentation</a><br></font>
+    <br>
   </div>
 
   <hr> <!-- ====================================================================== -->
-
-<div id="adoptioncontainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div><br>
+<br>
+<div id="adoptioncontainer" class="chart" width='100%' style="float: center"></div><br>
 
 <!-- CSV Link -->
   <div class="textright">
@@ -68,11 +68,13 @@ var trackOutboundLink = function(url) {
       <br>
       <a target="_blank" href="csv/adoption_eventtypelevel.csv" onclick="trackOutboundLink('csv/adoption_eventtypelevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Adoption % by Event Type </font></a>
       <br>
+      <a target="_blank" href="csv/adoption_eventlevel.csv" onclick="trackOutboundLink('csv/adoption_eventlevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Adoption % by Event </font></a>
+      <br>
   </div>
-
+<br>
   <hr> <!-- ====================================================================== -->
-
-<div id="activeuserscontainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br>
+<div id="activeuserscontainer" class="chart" width='100%' style="float: center"></div>
 
 <!-- CSV Link -->
   <div class="textright">
@@ -80,23 +82,25 @@ var trackOutboundLink = function(url) {
       <br>
       <a target="_blank" href="csv/activeusers_eventtypelevel.csv" onclick="trackOutboundLink('csv/activeusers_eventtypelevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Active User Count by Event Type </font></a>
       <br>
+      <a target="_blank" href="csv/activeusers_eventlevel.csv" onclick="trackOutboundLink('csv/activeusers_eventlevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Active User Count by Event </font></a>
+      <br>
   </div>
-
+<br>
   <hr> <!-- ====================================================================== -->
-
-<div id="eventscontainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br>
+<div id="eventscontainer" class="chart" width='100%' style="float: center"></div>
 
 <!-- CSV Link -->
   <div class="textright">
-      <a target="_blank" href="csv/events_weeklevel.csv" onclick="trackOutboundLink('csv/events_weeklevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Events Count </font></a>
+      <a target="_blank" href="csv/events_weeklevel.csv" onclick="trackOutboundLink('csv/events_weeklevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Event Count </font></a>
       <br>
-      <a target="_blank" href="csv/events_eventtypelevel.csv" onclick="trackOutboundLink('csv/events_eventtypelevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Events Count by Event Type </font></a>
+      <a target="_blank" href="csv/events_eventtypelevel.csv" onclick="trackOutboundLink('csv/events_eventtypelevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly Event Count by Event Type </font></a>
       <br>
   </div>
-
+<br>
   <hr> <!-- ====================================================================== -->
-
-<div id="appsessionscontainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br>
+<div id="appsessionscontainer" class="chart" width='100%' style="float: center"></div>
 
 <!-- CSV Link -->
   <div class="textright">
@@ -104,8 +108,10 @@ var trackOutboundLink = function(url) {
       <br>
       <a target="_blank" href="csv/appsessions_eventtypelevel.csv" onclick="trackOutboundLink('csv/appsessions_eventtypelevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly App Sessions Count by Event Type </font></a>
       <br>
+      <a target="_blank" href="csv/appsessions_eventlevel.csv" onclick="trackOutboundLink('csv/appsessions_eventlevel.csv'); return false;"><font size="1"> Exportable CSV: Weekly App Sessions Count by Event </font></a>
+      <br>
   </div>
-
+<br>
   <hr> <!-- ====================================================================== -->
 
 </body>

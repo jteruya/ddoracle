@@ -6,7 +6,7 @@
 \a
 \f
 -- \o /var/www/html/secondside/workspace/json/level_1.json
-\o /home/datadawgs/oracle/weeklyemail/json/activeusers_weeklevel.json
+\o :jsondir/activeusers_weeklevel.json
 
 select
   json_agg(row_to_json(s)) "data"
@@ -23,7 +23,7 @@ from
 
 \t 
 \f ','
-\o /home/datadawgs/oracle/weeklyemail/csv/activeusers_weeklevel.csv
+\o :csvdir/activeusers_weeklevel.csv
 
 select
    week_starting as "Week Of",
