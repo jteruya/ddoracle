@@ -1,7 +1,11 @@
 #!/usr/bin/python
 import sys
+import os
+
 # wd = '/var/www/html/secondside/workspace'
-wd = '/home/datadawgs/oracle/weeklyemail'
+#wd = '/home/datadawgs/oracle/weeklyemail'
+wd = os.getcwd() + '/weeklyemail'
+
 level1_file=sys.argv[1]
 level1_series = sys.argv[2]
 level2_file=sys.argv[3]
@@ -10,6 +14,7 @@ title = sys.argv[5]
 subtitle = sys.argv[6]
 yaxistitle = sys.argv[7]
 color = sys.argv[8]
+
 template = '''
 $(function () {
     // Create the chart
