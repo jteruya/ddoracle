@@ -17,6 +17,7 @@ from
     round(100*sum(adoption*registrants)/sum(registrants),2) y
   from dashboard.weekly_adoption_events
   where openevent = 0
+  and registrants > 0
   group by 1,2
   order by 1
 ) s
@@ -31,5 +32,6 @@ select
    round(100*sum(adoption*registrants)/sum(registrants),2) as "Adoption %"
 from dashboard.weekly_adoption_events
 where openevent = 0
+and registrants > 0
 group by 1
 order by 1;

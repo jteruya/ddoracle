@@ -17,7 +17,8 @@ left join (select week_starting
                 , adoption
                 , registrants
            from dashboard.weekly_adoption_events
-           where openevent = 0) events 
+           where openevent = 0
+           and registrants > 0) events 
 on spine.eventtype = events.eventtype and spine.week_starting = events.week_starting
 group by 1,2,3
 order by 1,2,3;  
