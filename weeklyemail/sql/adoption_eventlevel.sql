@@ -13,4 +13,5 @@ select week_starting as "Week Of"
      , adoption as "Adoption %" 
 from dashboard.weekly_adoption_events
 where openevent = 0
+and registrants > 0
 order by 1,3,4,2;
