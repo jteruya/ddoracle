@@ -8,7 +8,7 @@ select week_starting as "Week Of"
      , name as "Event Name"
      , startdate as "Event Start Date"
      , enddate as "Event End Date"
-     , registrants as "Users"
+     , registrants as "Registrants"
      , usersactive as "Active Users"
      , adoption as "Adoption %" 
 from dashboard.weekly_adoption_events
