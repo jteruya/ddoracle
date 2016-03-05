@@ -14,7 +14,7 @@ from
 ( select
     'Week of ' || week_starting "name",
     'Week of ' || week_starting drilldown,
-    round(100*avg(adoption),2) y
+    round(100*sum(usersactive)/sum(registrants),2) y
   from dashboard.weekly_adoption_events
   where openevent = 0
   and registrants > 0
@@ -29,7 +29,7 @@ from
 
 select
    week_starting as "Week Of",
-   round(100*avg(adoption),2) as "Adoption %"
+   round(100*sum(usersactive)/sum(registrants),2) as "Adoption %"
 from dashboard.weekly_adoption_events
 where openevent = 0
 and registrants > 0
