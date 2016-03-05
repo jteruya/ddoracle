@@ -6,7 +6,7 @@ select
    'Week of ' || spine.week_starting "name",
    'Week of ' || spine.week_starting id,
     spine.eventtype,
-    coalesce(round(100*avg(adoption),2),0) y
+    coalesce(round(100*sum(usersactive)/sum(registrants),2),0) y
 from (select week.week_starting
            , eventtype.eventtype  
       from (select distinct week_starting from dashboard.weekly_adoption_events) week
@@ -14,7 +14,7 @@ from (select week.week_starting
       on 1 = 1) spine 
 left join (select week_starting
                 , case when eventtype = '' then '_Unknown' else trim(split_part(eventtype,'(',1)) end eventtype
-                , adoption
+                , usersactive 
                 , registrants
            from dashboard.weekly_adoption_events
            where openevent = 0
