@@ -6,7 +6,7 @@ select
    'Week of ' || spine.week_starting "name",
    'Week of ' || spine.week_starting id,
     spine.eventtype,
-    coalesce(round(100*sum(adoption*registrants)/sum(registrants),2),0) y
+    coalesce(round(100*avg(adoption),2),0) y
 from (select week.week_starting
            , eventtype.eventtype  
       from (select distinct week_starting from dashboard.weekly_adoption_events) week
