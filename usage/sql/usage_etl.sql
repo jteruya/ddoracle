@@ -131,7 +131,7 @@ JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
 WHERE a.SRC NOT IN ('New_Metrics')
 AND a.Identifier IN ('menuitem')
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'4 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'4 months')||'-01 00:00:00' AS TIMESTAMP) --Past 4 months
 AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 
@@ -153,7 +153,7 @@ JOIN PUBLIC.AuthDB_Applications app ON a.ApplicationId = app.ApplicationId
 WHERE a.SRC IN ('New_Metrics')
 AND a.Identifier IN ('menuItem')
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'4 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'4 months')||'-01 00:00:00' AS TIMESTAMP) --Past 4 months
 AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 AND CAST(a.Metadata ->> 'Url' AS TEXT) NOT LIKE '%://topic%'
@@ -177,7 +177,7 @@ LEFT JOIN Ratings_Topic t ON CAST(REPLACE(REPLACE(CAST(a.Metadata ->> 'Url' AS T
 WHERE a.SRC IN ('New_Metrics')
 AND a.Identifier IN ('menuItem')
 AND app.StartDate <= CURRENT_DATE --Only Events that have already started
-AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'7 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'7 months')||'-01 00:00:00' AS TIMESTAMP) --Past 7 months
+AND app.StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'4 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'4 months')||'-01 00:00:00' AS TIMESTAMP) --Past 4 months
 AND a.Created >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP) --Past 13 months
 AND a.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --Remove Test Events
 AND CAST(a.Metadata ->> 'Url' AS TEXT) LIKE '%://topic%'

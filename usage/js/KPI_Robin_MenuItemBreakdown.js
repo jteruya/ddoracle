@@ -16,7 +16,7 @@ menuitembreakdown_options = {
     text: 'Menu Item Tap % - by Month'
   },
   subtitle: {
-    text: '(for the past 7 months)'
+    text: '(for the past 4 months)'
   },
   tooltip: {
     formatter: function () {

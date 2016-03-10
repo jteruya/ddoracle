@@ -16,7 +16,7 @@ tap1_menuitembreakdown_options = {
     text: 'Distribution of FIRST Menu Item taps - by Month'
   },
   subtitle: {
-    text: '(for the past 7 months)'
+    text: '(for the past 4 months)'
   },
   tooltip: {
     formatter: function () {
