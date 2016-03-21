@@ -4,7 +4,7 @@ import os
 
 # wd = '/var/www/html/secondside/workspace'
 #wd = '/home/datadawgs/oracle/weeklyemail'
-wd = os.getcwd() + '/weeklyemail'
+wd = os.getcwd() + '/oracle/weeklyemail'
 
 level1_file=sys.argv[1]
 level1_series = sys.argv[2]
