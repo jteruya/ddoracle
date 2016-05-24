@@ -6,15 +6,14 @@
   <meta charset="utf-8">
   <meta name="author" content="#datadawgs">
   <link rel="icon" href="image/favicon.ico" type="image/x-icon">
-  <title>Product Health - Bookmark KPIs</title>
+  <title>Product Health - Login Flow KPIs</title>
 
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <!-- <script src="js/highcharts.js"></script> -->
   <script src="http://code.highcharts.com/highcharts.js"></script>
 
-  <script src="js/KPI_Robin_InitialLoginDevices.js"></script>
-  <script src="js/KPI_Robin_iOSOpenLoginFunnel.js"></script>
-  <script src="js/KPI_Robin_iOSClosedLoginFunnel.js"></script>
+  <script src="js/KPI_Robin_AndroidLoginFunnel.js"></script>
+  <script src="js/KPI_Robin_iOSLoginFunnel.js"></script>    
 
   <style>
     /* img.icon {width: 100px; height: 100px;} */
@@ -41,31 +40,21 @@
   <hr> <!-- ====================================================================== -->
 
   <!-- Chart: Bookmarks per User -->
-  <div id="initallogindevices" class="chart" width='100%' style="float: center"></div>
+  <div id="androidloginfunnel" class="chart" width='100%' style="float: center"></div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_InitialLoginDevices.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_AndroidLoginFunnel.csv"><font size="2">Download CSV</font></a>
   </div>
 
   <br> <!-- ====================================================================== -->
 
-  <!-- Chart: Bookmarking Users -->
-  <div id="iosopenloginfunnel" class="chart" width='100%' style="float: center"></div>
+  <!-- Chart: Bookmarks per User -->
+  <div id="iosloginfunnel" class="chart" width='100%' style="float: center"></div>
 
   <!-- CSV Link -->
   <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_iOSOpenLoginFunnel.csv"><font size="2">Download CSV</font></a>
-  </div>
-
-  <br> <!-- ====================================================================== -->
-
-  <!-- Chart: Bookmarking Users -->
-  <div id="iosclosedloginfunnel" class="chart" width='100%' style="float: center"></div>
-
-  <!-- CSV Link -->
-  <div class="chart">
-      <a target="_blank" href="csv/KPI_Robin_iOSClosedLoginFunnel.csv"><font size="2">Download CSV</font></a>
+      <a target="_blank" href="csv/KPI_Robin_iOSLoginFunnel.csv"><font size="2">Download CSV</font></a>
   </div>
 
   <br> <!-- ====================================================================== -->
