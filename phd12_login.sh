@@ -21,18 +21,18 @@
 kpi_domain="login"
 wd="oracle"
 etl="${kpi_domain}_etl"
-#domain_wd="$HOME/${wd}/${kpi_domain}"
-domain_wd="$HOME/repo/${wd}/${kpi_domain}"
+domain_wd="$HOME/${wd}/${kpi_domain}"
+#domain_wd="$HOME/repo/${wd}/${kpi_domain}"
 
 # Report fields
-kpi_initial_login_devices_report="KPI_Robin_InitialLoginDevices"
-kpi_ios_open_login_funnel_report="KPI_Robin_iOSOpenLoginFunnel"
-kpi_ios_closed_login_funnel_report="KPI_Robin_iOSClosedLoginFunnel"
+#kpi_initial_login_devices_report="KPI_Robin_InitialLoginDevices"
+kpi_ios_login_funnel_report="KPI_Robin_iOSLoginFunnel"
+kpi_android_login_funnel_report="KPI_Robin_AndroidLoginFunnel"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
-#transpose="python $HOME/tools/transpose.py"
-transpose="python $HOME/repo/tools/transpose.py"
+transpose="python $HOME/tools/transpose.py"
+#transpose="python $HOME/repo/tools/transpose.py"
 index_insights_fill="python ${kpi_domain_wd}/index_insights_fill.py"
 email_reports_wd="$HOME/email_reports"
 
@@ -84,8 +84,8 @@ echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 $run_sql_robin $domain_wd/sql/$kpi_initial_login_devices_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_initial_login_devices_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_ios_open_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_open_login_funnel_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_ios_closed_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_closed_login_funnel_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_ios_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_login_funnel_report.csv 
+$run_sql_robin $domain_wd/sql/$kpi_android_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_login_funnel_report.csv 
 #$run_sql_robin $domain_wd/sql/$kpi_chat_user_detail_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_chat_user_detail_report.csv 
 #$run_sql_robin $domain_wd/sql/$kpi_chat_split_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_chat_split_report.csv 
 
@@ -96,8 +96,9 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-$transpose $domain_wd/csv/$kpi_ios_open_login_funnel_report.csv 
-$transpose $domain_wd/csv/$kpi_ios_closed_login_funnel_report.csv
+#$transpose $domain_wd/csv/$kpi_ios_open_login_funnel_report.csv 
+#$transpose $domain_wd/csv/$kpi_ios_closed_login_funnel_report.csv
+#$transpose $domain_wd/csv/$kpi_ios_login_funnel_report.csv
 
 # ====================================================================================================== ========== 4
 #  4  #
