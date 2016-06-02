@@ -15,9 +15,9 @@ iosloginfunnel_options = {
     xAxis: {
         categories: ['Enter Email View', 
                      'Enter Password View', 
-                     'Reset Password View (Optional)', 
+                     /*'Reset Password View (Optional)',*/ 
                      'Event Picker View', 
-                     'LinkedIn Import View (Not on all Events)', 
+                     /*'LinkedIn Import View (Not on all Events)',*/
                      'Profile Filler View', 
                      'Login Success'],
         title: {
@@ -33,11 +33,11 @@ iosloginfunnel_options = {
     legend: {
       reversed: true
     },
-    plotOptions: {
+    /*plotOptions: {
         series: {
           stacking: 'normal'
         }
-    },
+    },*/
     series: []
 };
 
@@ -72,8 +72,8 @@ $.get('csv/KPI_Robin_iOSLoginFunnel.csv', function(data) {
         series.data.push([items[4],parseFloat(items[4])])
         series.data.push([items[5],parseFloat(items[5])])
         series.data.push([items[6],parseFloat(items[6])])
-        series.data.push([items[7],parseFloat(items[7])]) 
-        series.data.push([items[8],parseFloat(items[8])])    
+        /*series.data.push([items[7],parseFloat(items[7])]) 
+        series.data.push([items[8],parseFloat(items[8])]) */   
         prev_series = series
 
         iosloginfunnel_options.series.push(series) 

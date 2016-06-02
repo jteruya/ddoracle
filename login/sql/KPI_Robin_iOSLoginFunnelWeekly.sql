@@ -3,6 +3,7 @@ select case
           when bundles.bundle_type = 'closed' then 'Closed Bundle'
           else 'Mixed Bundle'
        end as "Bundle Type"
+     , cal.week_starting as "Week Starting"
      , count(*) as "Total App Count"  
      , count(case when enterEmailMinDate is not null then 1 else null end) as "Enter Email View"
      , count(case when enterPasswordMinDate is not null then 1 else null end) as "Enter Password View"
@@ -17,11 +18,13 @@ on spine.bundle_id = bundles.bundle_id
 join jt.pa506_logincube_sessions sessions
 on spine.bundle_id = sessions.bundle_id
 and spine.device_id = sessions.device_id
-where (spine.loginFlowStartInitialEnterEmailMinDate is not null)
+join dashboard.calendar_wk cal
+on spine.loginFlowStartInitialEnterEmailMinDate::date = cal.date
+where (spine.loginFlowStartInitialEnterEmailMinDate is not null or spine.loginFlowStartInitialAccountPickerMinDate is not null)
 and spine.loginFlowStartNonInitialMinDate is null
-and (spine.loginFlowStartInitialEnterEmailMinDate <= sessions.firstLogin)
+and ((spine.loginFlowStartInitialEnterEmailMinDate is not null and spine.loginFlowStartInitialEnterEmailMinDate <= sessions.firstLogin) or (spine.loginFlowStartInitialAccountPickerMinDate is not null and spine.loginFlowStartInitialAccountPickerMinDate <= sessions.firstLogin))
 and spine.device_type = 'ios'
 and bundles.bundle_type in ('open', 'closed')
-group by 1
-order by 1
+group by 1,2
+order by 1,2
 ;

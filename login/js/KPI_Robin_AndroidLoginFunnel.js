@@ -17,9 +17,7 @@ androidloginfunnel_options = {
                      'Account Picker View',
                      'Enter Email View', 
                      'Enter Password View', 
-                     'Reset Password View (Optional)', 
                      'Event Picker View', 
-                     'LinkedIn Import View (Not on all Events)', 
                      'Profile Filler View', 
                      'Login Success'],
         title: {
@@ -75,9 +73,7 @@ $.get('csv/KPI_Robin_AndroidLoginFunnel.csv', function(data) {
         series.data.push([items[4],parseFloat(items[4])])
         series.data.push([items[5],parseFloat(items[5])])
         series.data.push([items[6],parseFloat(items[6])])
-        series.data.push([items[7],parseFloat(items[7])])
-        series.data.push([items[8],parseFloat(items[8])])
-        series.data.push([items[9],parseFloat(items[9])])       
+        series.data.push([items[7],parseFloat(items[7])])     
         prev_series = series
 
         androidloginfunnel_options.series.push(series) 
