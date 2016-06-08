@@ -12,11 +12,13 @@ select lower(a.bundleid) as bundle_id
          when count(case when b.canregister = false then 1 else null end) > 0 and count(case when b.canregister = true then 1 else null end) = 0 then 'closed'
          else 'mixed'
        end as bundle_type
-from (select distinct b.bundleid
-      from dashboard.weekly_adoption_events a
-      join authdb_applications b
-      on a.applicationid = b.applicationid
-      and a.binaryversion >= '6.3') a
+from (select distinct aa.bundleid
+      from eventcube.eventcubesummary ecs
+      left join eventcube.testevents te
+      on ecs.applicationid = te.applicationid
+      join authdb_applications aa
+      on ecs.applicationid = aa.applicationid
+      where te.applicationid is null) a
 join authdb_applications b
 on a.bundleid = b.bundleid
 group by 1;
@@ -28,14 +30,30 @@ drop table if exists dashboard.kpi_login_checkpoint_metrics
 create table dashboard.kpi_login_checkpoint_metrics as
 select a.*
 from fact_checkpoints_live a
-join (select distinct b.bundleid
-      from dashboard.weekly_adoption_events a
-      join authdb_applications b
-      on a.applicationid = b.applicationid
-      and a.binaryversion >= '6.3') b
+join (select distinct aa.bundleid
+      from eventcube.eventcubesummary ecs
+      left join eventcube.testevents te
+      on ecs.applicationid = te.applicationid
+      join authdb_applications aa
+      on ecs.applicationid = aa.applicationid
+      where te.applicationid is null
+      ) b
 on a.bundle_id = lower(b.bundleid)
+join (select wk.week_starting
+           , date
+      from dashboard.calendar_wk wk
+      join (select min(week_starting) as firstweek
+                 , max(week_starting) as lastweek
+            from dashboard.calendar_wk
+            where date <= current_date - 1 and date >= current_date - 60
+            ) weeklimit
+      on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek
+      ) c
+on a.created::date = c.date
 where a.identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
+and a.binary_version >= '6.3'
 ;
+
 
 -- Creat Index for Login Checkpoints Staging Table
 create index indx_kpi_login_checkpoint_metrics on dashboard.kpi_login_checkpoint_metrics (bundle_id, device_id, device_type)
@@ -48,13 +66,28 @@ drop table if exists dashboard.kpi_login_view_metrics
 create table dashboard.kpi_login_view_metrics as
 select a.*
 from fact_views_live a
-join (select distinct b.bundleid
-      from dashboard.weekly_adoption_events a
-      join authdb_applications b
-      on a.applicationid = b.applicationid
-      and a.binaryversion >= '6.3') b
+join (select distinct aa.bundleid
+      from eventcube.eventcubesummary ecs
+      left join eventcube.testevents te
+      on ecs.applicationid = te.applicationid
+      join authdb_applications aa
+      on ecs.applicationid = aa.applicationid
+      where te.applicationid is null
+      ) b
 on a.bundle_id = lower(b.bundleid)
+join (select wk.week_starting
+           , date
+      from dashboard.calendar_wk wk
+      join (select min(week_starting) as firstweek
+                 , max(week_starting) as lastweek
+            from dashboard.calendar_wk
+            where date <= current_date - 1 and date >= current_date - 60
+            ) weeklimit
+      on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek
+      ) c
+on a.created::date = c.date
 where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
+and a.binary_version >= '6.3'
 ;
 
 -- Creat Index for Login Views Staging Table
@@ -68,13 +101,28 @@ drop table if exists dashboard.kpi_login_action_metrics
 create table dashboard.kpi_login_action_metrics as
 select a.*
 from fact_actions_live a
-join (select distinct b.bundleid
-      from dashboard.weekly_adoption_events a
-      join authdb_applications b
-      on a.applicationid = b.applicationid
-      and a.binaryversion >= '6.3') b
+join (select distinct aa.bundleid
+      from eventcube.eventcubesummary ecs
+      left join eventcube.testevents te
+      on ecs.applicationid = te.applicationid
+      join authdb_applications aa
+      on ecs.applicationid = aa.applicationid
+      where te.applicationid is null
+      ) b
 on a.bundle_id = lower(b.bundleid)
+join (select wk.week_starting
+           , date
+      from dashboard.calendar_wk wk
+      join (select min(week_starting) as firstweek
+                 , max(week_starting) as lastweek
+            from dashboard.calendar_wk
+            where date <= current_date - 1 and date >= current_date - 60
+            ) weeklimit
+      on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek
+      ) c
+on a.created::date = c.date
 where a.identifier in ('accountSelectButton','anotherAccountButton','enterEmailTextField','submitEmailButton','enterPasswordTextField','submitPasswordButton','resetPasswordButton','cancelResetPasswordButton','submitResetPasswordButton','eventSelectButton','changeProfilePhotoButton','cancelProfilePhotoAction','enterFirstNameTextField','enterLastNameTextField','enterCompanyTextField','enterTitleTextField','addSocialNetworkToProfileButton','submitProfileButton','createProfileButton','emailSupport')
+and a.binary_version >= '6.3'
 ;
 
 -- Creat Index for Login Actions Staging Table

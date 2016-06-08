@@ -21,8 +21,8 @@
 kpi_domain="login"
 wd="oracle"
 etl="${kpi_domain}_etl"
-domain_wd="$HOME/${wd}/${kpi_domain}"
-#domain_wd="$HOME/repo/${wd}/${kpi_domain}"
+#domain_wd="$HOME/${wd}/${kpi_domain}"
+domain_wd="$HOME/repo/${wd}/${kpi_domain}"
 
 # Report fields
 #kpi_initial_login_devices_report="KPI_Robin_InitialLoginDevices"
@@ -43,8 +43,8 @@ kpi_android_closed_login_funnel_weekly_report="KPI_Robin_AndroidClosedLoginFunne
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
-transpose="python $HOME/tools/transpose.py"
-#transpose="python $HOME/repo/tools/transpose.py"
+#transpose="python $HOME/tools/transpose.py"
+transpose="python $HOME/repo/tools/transpose.py"
 index_insights_fill="python ${kpi_domain_wd}/index_insights_fill.py"
 email_reports_wd="$HOME/email_reports"
 

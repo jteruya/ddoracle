@@ -13,7 +13,7 @@ iosclosedloginfunneldevicesweekly_options = {
     borderWidth: 1
   },
   title: {
-    text: 'iOS Open Bundle Login Funnel Devices per Week'
+    text: 'iOS Closed Bundle Login Funnel Devices per Week'
   },
   subtitle: {
     text: '(for the past 10 weeks)'
