@@ -1,89 +1,93 @@
--- Get Events with 6.3 version or higher
-drop table if exists jt.pa506_events;
-create table jt.pa506_events as
-select c.bundleid
-     , a.*
-from eventcube.eventcubesummary a
-left join eventcube.testevents b
-on a.applicationid = b.applicationid
-join authdb_applications c
-on a.applicationid = c.applicationid
-where a.binaryversion like '6.%'
-and a.binaryversion not like '6.0%'
-and a.binaryversion not like '6.1%'
-and a.binaryversion not like '6.2%'
-and a.binaryversion not like '6.3%'
-and b.applicationid is null
-and a.startdate >= current_date - interval '3' month
-and a.enddate < current_date
+-- Classify Bundles (New)
+drop table if exists dashboard.kpi_login_bundle_reg_type
 ;
 
+create table dashboard.kpi_login_bundle_reg_type as
+select lower(a.bundleid) as bundle_id
+     , count(*) as eventcnt
+     , count(case when b.canregister = true then 1 else null end) as openeventcnt
+     , count(case when b.canregister = false then 1 else null end) as closedeventcnt
+     , case
+         when count(case when b.canregister = true then 1 else null end) > 0 and count(case when b.canregister = false then 1 else null end) = 0 then 'open'
+         when count(case when b.canregister = false then 1 else null end) > 0 and count(case when b.canregister = true then 1 else null end) = 0 then 'closed'
+         else 'mixed'
+       end as bundle_type
+from (select distinct b.bundleid
+      from dashboard.weekly_adoption_events a
+      join authdb_applications b
+      on a.applicationid = b.applicationid
+      and a.binaryversion >= '6.3') a
+join authdb_applications b
+on a.bundleid = b.bundleid
+group by 1;
+
 -- Get Login Checkpoints
-drop table if exists jt.pa506_checkpoint_metrics;
-create table jt.pa506_checkpoint_metrics as
+drop table if exists dashboard.kpi_login_checkpoint_metrics
+;
+
+create table dashboard.kpi_login_checkpoint_metrics as
 select a.*
 from fact_checkpoints_live a
-join jt.pa506_events b
+join (select distinct b.bundleid
+      from dashboard.weekly_adoption_events a
+      join authdb_applications b
+      on a.applicationid = b.applicationid
+      and a.binaryversion >= '6.3') b
 on a.bundle_id = lower(b.bundleid)
 where a.identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
 ;
 
-create index indx_pa506_checkpoint_metrics on jt.pa506_checkpoint_metrics (bundle_id, device_id, device_type);
+-- Creat Index for Login Checkpoints Staging Table
+create index indx_kpi_login_checkpoint_metrics on dashboard.kpi_login_checkpoint_metrics (bundle_id, device_id, device_type)
+;
 
--- Get (Possible) Login Views
-drop table if exists jt.pa506_view_metrics;
-create table jt.pa506_view_metrics as
+-- Get Login Views
+drop table if exists dashboard.kpi_login_view_metrics
+;
+
+create table dashboard.kpi_login_view_metrics as
 select a.*
 from fact_views_live a
-join jt.pa506_events b
+join (select distinct b.bundleid
+      from dashboard.weekly_adoption_events a
+      join authdb_applications b
+      on a.applicationid = b.applicationid
+      and a.binaryversion >= '6.3') b
 on a.bundle_id = lower(b.bundleid)
 where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
 ;
 
-create index indx_pa506_view_metrics on jt.pa506_view_metrics (bundle_id, device_id, device_type);
+-- Creat Index for Login Views Staging Table
+create index indx_kpi_login_view_metrics on dashboard.kpi_login_view_metrics (bundle_id, device_id, device_type)
+;
 
--- Get (Possible) Login Actions
-drop table if exists jt.pa506_action_metrics;
-create table jt.pa506_action_metrics as
+-- Get Login Actions
+drop table if exists dashboard.kpi_login_action_metrics
+;
+
+create table dashboard.kpi_login_action_metrics as
 select a.*
 from fact_actions_live a
-join jt.pa506_events b
+join (select distinct b.bundleid
+      from dashboard.weekly_adoption_events a
+      join authdb_applications b
+      on a.applicationid = b.applicationid
+      and a.binaryversion >= '6.3') b
 on a.bundle_id = lower(b.bundleid)
-where a.identifier in ('accountSelectButton','anotherAccountButton','enterEmailTextField','submitEmailButton','enterPasswordTextField','submitPasswordButton','resetPasswordButton','cancelResetPasswordButton','submitResetPasswordButton','eventSelectButton','changeProfilePhotoButton','cancelProfilePhotoAction','enterFirstNameTextField','enterLastNameTextField','enterCompanyTextField','enterTitleTextField','addSocialNetworkToProfileButton','submitProfileButton','createProfileButton')
+where a.identifier in ('accountSelectButton','anotherAccountButton','enterEmailTextField','submitEmailButton','enterPasswordTextField','submitPasswordButton','resetPasswordButton','cancelResetPasswordButton','submitResetPasswordButton','eventSelectButton','changeProfilePhotoButton','cancelProfilePhotoAction','enterFirstNameTextField','enterLastNameTextField','enterCompanyTextField','enterTitleTextField','addSocialNetworkToProfileButton','submitProfileButton','createProfileButton','emailSupport')
 ;
 
-create index indx_pa506_actions_metrics on jt.pa506_action_metrics (bundle_id, device_id, device_type);
-
-
--- Get Email Support Login Actions (Add on to the actions)
-drop table if exists jt.pa506_action_email_support_metrics;
-create table jt.pa506_action_email_support_metrics as
-select a.*
-from fact_actions_live a
-join jt.pa506_events b
-on a.bundle_id = lower(b.bundleid)
-where a.identifier in ('emailSupport')
+-- Creat Index for Login Actions Staging Table
+create index indx_kpi_login_action_metrics on dashboard.kpi_login_action_metrics (bundle_id, device_id, device_type)
 ;
 
--- Check to make sure proportions look good.
-select identifier
-     , count(distinct device_id) as total
-     , count(distinct case when device_type = 'ios' then device_id else null end) as ios
-     , count(distinct case when device_type = 'android' then device_id else null end) as android
-     , count(distinct case when device_type = 'ios' then device_id else null end)::decimal(12,4)/count(distinct device_id)::decimal(12,4) as iospct
-     , count(distinct case when device_type = 'android' then device_id else null end)::decimal(12,4)/count(distinct device_id)::decimal(12,4) as androidpct
-from jt.pa506_checkpoint_metrics
-group by 1
-;
--- Passed
 
-drop table if exists jt.pa506_checkpoint_spine;
-create table jt.pa506_checkpoint_spine as
+-- Device/Bundle Level Checkpoint Staging Table
+drop table if exists dashboard.kpi_login_device_checkpoint_metrics;
+create table dashboard.kpi_login_device_checkpoint_metrics as
 select bundle_id
      , device_id
      , device_type
-     
-     , count(distinct session_id) as sessionCnt  
 
      -- Checkpoints
      -- loginFlowStart (Initial - enterEmail)
@@ -171,41 +175,21 @@ select bundle_id
      , max(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as profileFillerLoginSuccessNonInitialMaxDate
      , count(distinct case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as profileFillerLoginSuccessNonInitialSessionCnt         
 
-from jt.pa506_checkpoint_metrics
+from dashboard.kpi_login_checkpoint_metrics
 -- Filter out SSO bundles
 where bundle_id not in (select distinct bundle_id
-                        from jt.pa506_view_metrics
+                        from dashboard.kpi_login_view_metrics
                         where identifier = 'remoteSsoLogin')
 group by 1,2,3
 ;
 
-
-select device_type
-     , login_path
-     , count(*) as cnt
-from (
-select device_type
-     , case when loginFlowStartInitialMinDate is not null then cast('loginFlowStart ' as text) else '' end ||
-       case when accountPickerLoginSuccessInitialOpenMinDate is not null or accountPickerLoginSuccessInitialClosedMinDate is not null then cast(' accountPickerLoginSuccess' as text) else '' end ||
-       case when enterEmailLoginSuccessInitialOpenMinDate is not null or enterEmailLoginSuccessInitialClosedMinDate is not null then cast(' enterEmailLoginSuccess' as text) else '' end ||
-       case when enterPasswordLoginSuccessInitialMinDate is not null then cast(' enterPasswordLoginSuccess' as text) else '' end ||
-       case when eventPickerLoginSuccessInitialMinDate is not null then cast(' eventPickerLoginSuccess' as text) else '' end ||
-       case when profileFillerLoginSuccessInitialMinDate is not null then cast(' profileFillerLoginSuccess' as text) else '' end
-       as login_path
-from jt.pa506_checkpoint_spine
-where loginFlowStartInitialMinDate is not null) a
-group by 1,2
-order by 1,3 desc;
-
-
-drop table if exists jt.pa506_view_spine;
-create table jt.pa506_view_spine as
+-- Device/Bundle Level View Staging Table
+drop table if exists dashboard.kpi_login_device_view_metrics;
+create table dashboard.kpi_login_device_view_metrics as
 select bundle_id
      , device_id
      , device_type
-     
-     , count(distinct session_id) as sessionCnt  
-
+    
      -- Views & Actions
      -- accountPicker (View)
      , min(case when identifier = 'accountPicker' then created else null end) as accountPickerMinDate
@@ -242,22 +226,20 @@ select bundle_id
      , max(case when identifier = 'profileFiller' then created else null end) as profileFillerMaxDate
      , count(distinct case when identifier = 'profileFiller' then session_id else null end) as profileFillerSessionCnt  
              
-from jt.pa506_view_metrics
+from dashboard.kpi_login_view_metrics
 -- Filter out SSO bundles
 where bundle_id not in (select distinct bundle_id
-                        from jt.pa506_view_metrics
+                        from dashboard.kpi_login_view_metrics
                         where identifier = 'remoteSsoLogin')
 group by 1,2,3
 ;
 
-
-drop table if exists jt.pa506_action_spine;
-create table jt.pa506_action_spine as
+-- Device/Bundle Level Action Staging Table
+drop table if exists dashboard.kpi_login_device_action_metrics;
+create table dashboard.kpi_login_device_action_metrics as
 select bundle_id
      , device_id
-     , device_type
-     
-     , count(distinct session_id) as sessionCnt  
+     , device_type 
 
      -- accountSelectButton (Action)
      , min(case when identifier = 'accountSelectButton' then created else null end) as accountSelectButtonMinDate
@@ -378,39 +360,36 @@ select bundle_id
      , min(case when identifier = 'submitProfileButton' then created else null end) as submitProfileButtonMinDate
      , max(case when identifier = 'submitProfileButton' then created else null end) as submitProfileButtonMaxDate
      , count(distinct case when identifier = 'submitProfileButton' then session_id else null end) as submitProfileButtonSessionCnt        
-from (select *
-      from jt.pa506_action_metrics
-      union all
-      select *
-      from jt.pa506_action_email_support_metrics) a
+from dashboard.kpi_login_action_metrics a
 -- Filter out SSO bundles
 where bundle_id not in (select distinct bundle_id
-                        from jt.pa506_view_metrics
+                        from dashboard.kpi_login_view_metrics
                         where identifier = 'remoteSsoLogin')
 group by 1,2,3
 ;
 
--- Drive Spine
-drop table if exists jt.pa506_device_spine;
-create table jt.pa506_device_spine as
+-- Create a Device Spine
+drop table if exists dashboard.kpi_login_devices;
+create table dashboard.kpi_login_devices as
 select distinct bundle_id
      , device_id
      , device_type
-from jt.pa506_checkpoint_spine
+from dashboard.kpi_login_device_action_metrics
 union
 select distinct bundle_id
      , device_id
      , device_type
-from jt.pa506_view_spine
+from dashboard.kpi_login_device_view_metrics
 union
 select distinct bundle_id
      ,device_id
      , device_type
-from jt.pa506_action_spine;
+from dashboard.kpi_login_device_checkpoint_metrics
+;
 
--- Login Cube
-drop table if exists jt.pa506_logincube;
-create table jt.pa506_logincube as
+-- Login Funnel at the Device/Bundle Level
+drop table if exists dashboard.kpi_login_devices_checklist;
+create table dashboard.kpi_login_devices_checklist as
 select device.device_id
      , device.bundle_id
      , device.device_type
@@ -471,14 +450,28 @@ select device.device_id
      , action.submitProfileButtonMinDate
      , checkpoint.profileFillerLoginSuccessInitialMinDate
      
-from jt.pa506_device_spine device
-left join jt.pa506_checkpoint_spine checkpoint
+from dashboard.kpi_login_devices device
+left join dashboard.kpi_login_device_checkpoint_metrics checkpoint
 on device.device_id = checkpoint.device_id
 and device.bundle_id = checkpoint.bundle_id
-left join jt.pa506_view_spine view
+left join dashboard.kpi_login_device_view_metrics view
 on device.device_id = view.device_id
 and device.bundle_id = view.bundle_id
-left join jt.pa506_action_spine action
+left join dashboard.kpi_login_device_action_metrics action
 on device.device_id = action.device_id
 and device.bundle_id = action.bundle_id
+;
+
+-- Get 1st Session for Device
+drop table if exists dashboard.kpi_login_devices_checklist_firstsessions;
+create table dashboard.kpi_login_devices_checklist_firstsessions as
+select a.device_id
+     , a.bundle_id
+     , min(created) as firstlogin
+from fact_sessions_live a
+join dashboard.kpi_login_devices_checklist b
+on a.device_id = b.device_id
+and a.bundle_id = b.bundle_id
+where a.identifier = 'start'
+group by 1,2
 ;
