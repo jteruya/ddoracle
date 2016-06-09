@@ -25,21 +25,15 @@ etl="${kpi_domain}_etl"
 domain_wd="$HOME/repo/${wd}/${kpi_domain}"
 
 # Report fields
-#kpi_initial_login_devices_report="KPI_Robin_InitialLoginDevices"
-#kpi_ios_login_funnel_report="KPI_Robin_iOSLoginFunnel"
-#kpi_android_login_funnel_report="KPI_Robin_AndroidLoginFunnel"
-#kpi_ios_login_funnel_weekly_report="KPI_Robin_iOSLoginFunnelWeekly"
-kpi_ios_open_login_funnel_devices_weekly_report="KPI_Robin_iOSOpenLoginFunnelDevicesWeekly"
-kpi_ios_closed_login_funnel_devices_weekly_report="KPI_Robin_iOSClosedLoginFunnelDevicesWeekly"
-kpi_ios_open_login_funnel_weekly_report="KPI_Robin_iOSOpenLoginFunnelWeekly"
-kpi_ios_closed_login_funnel_weekly_report="KPI_Robin_iOSClosedLoginFunnelWeekly"
+kpi_ios_open_login_funnel_devices_monthly_report="KPI_Robin_iOSOpenLoginFunnelDevicesMonthly"
+kpi_ios_closed_login_funnel_devices_monthly_report="KPI_Robin_iOSClosedLoginFunnelDevicesMonthly"
+kpi_ios_open_login_funnel_monthly_report="KPI_Robin_iOSOpenLoginFunnelMonthly"
+kpi_ios_closed_login_funnel_monthly_report="KPI_Robin_iOSClosedLoginFunnelMonthly"
 
-kpi_android_open_login_funnel_devices_weekly_report="KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly"
-kpi_android_closed_login_funnel_devices_weekly_report="KPI_Robin_AndroidClosedLoginFunnelDevicesWeekly"
-kpi_android_open_login_funnel_weekly_report="KPI_Robin_AndroidOpenLoginFunnelWeekly"
-kpi_android_closed_login_funnel_weekly_report="KPI_Robin_AndroidClosedLoginFunnelWeekly"
-#kpi_ios_login_funnel_start_weekly_report="KPI_Robin_iOSLoginFunnelStartWeekly"
-#kpi_ios_login_funnel_enterpassword_weekly_report="KPI_Robin_iOSLoginFunnelEnterPasswordWeekly"
+kpi_android_open_login_funnel_devices_monthly_report="KPI_Robin_AndroidOpenLoginFunnelDevicesMonthly"
+kpi_android_closed_login_funnel_devices_monthly_report="KPI_Robin_AndroidClosedLoginFunnelDevicesMonthly"
+kpi_android_open_login_funnel_monthly_report="KPI_Robin_AndroidOpenLoginFunnelMonthly"
+kpi_android_closed_login_funnel_monthly_report="KPI_Robin_AndroidClosedLoginFunnelMonthly"
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
@@ -95,24 +89,16 @@ echo "--------------------------------------------------------------------------
 echo "REPORTS - Run the SQL Reports ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-#$run_sql_robin $domain_wd/sql/$kpi_initial_login_devices_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_initial_login_devices_report.csv 
-#$run_sql_robin $domain_wd/sql/$kpi_ios_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_login_funnel_report.csv 
-#$run_sql_robin $domain_wd/sql/$kpi_android_login_funnel_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_login_funnel_report.csv 
-#$run_sql_robin $domain_wd/sql/$kpi_ios_login_funnel_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_login_funnel_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_ios_open_login_funnel_devices_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_open_login_funnel_devices_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_ios_closed_login_funnel_devices_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_closed_login_funnel_devices_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_ios_open_login_funnel_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_open_login_funnel_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_ios_closed_login_funnel_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_closed_login_funnel_weekly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_ios_open_login_funnel_devices_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_open_login_funnel_devices_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_ios_closed_login_funnel_devices_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_closed_login_funnel_devices_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_ios_open_login_funnel_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_open_login_funnel_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_ios_closed_login_funnel_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_closed_login_funnel_monthly_report.csv
 
-$run_sql_robin $domain_wd/sql/$kpi_android_open_login_funnel_devices_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_open_login_funnel_devices_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_android_closed_login_funnel_devices_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_closed_login_funnel_devices_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_android_open_login_funnel_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_open_login_funnel_weekly_report.csv
-$run_sql_robin $domain_wd/sql/$kpi_android_closed_login_funnel_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_closed_login_funnel_weekly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_android_open_login_funnel_devices_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_open_login_funnel_devices_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_android_closed_login_funnel_devices_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_closed_login_funnel_devices_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_android_open_login_funnel_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_open_login_funnel_monthly_report.csv
+$run_sql_robin $domain_wd/sql/$kpi_android_closed_login_funnel_monthly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_android_closed_login_funnel_monthly_report.csv
 
-#$run_sql_robin $domain_wd/sql/$kpi_ios_login_funnel_start_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_login_funnel_start_weekly_report.csv 
-#$run_sql_robin $domain_wd/sql/$kpi_ios_login_funnel_enterpassword_weekly_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_ios_login_funnel_enterpassword_weekly_report.csv
-#$run_sql_robin $domain_wd/sql/$kpi_chat_user_detail_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_chat_user_detail_report.csv 
-#$run_sql_robin $domain_wd/sql/$kpi_chat_split_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_chat_split_report.csv 
 
 
 # ====================================================================================================== ========== 3b
@@ -121,11 +107,6 @@ echo "REPORTS - Move and Transpose the Report Datasets ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 # Transpose the Result Set CSV
-#$transpose $domain_wd/csv/$kpi_ios_open_login_funnel_report.csv 
-#$transpose $domain_wd/csv/$kpi_ios_closed_login_funnel_report.csv
-#$transpose $domain_wd/csv/$kpi_ios_login_funnel_report.csv
-#$transpose $domain_wd/csv/$kpi_ios_login_funnel_start_weekly_report.csv
-#$transpose $domain_wd/csv/$kpi_ios_open_login_funnel_weekly_report.csv
 
 # ====================================================================================================== ========== 4
 #  4  #

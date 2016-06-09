@@ -3,9 +3,9 @@
 
 $(document).ready(function() {
 
-androidopenloginfunneldevicesweekly_options = {
+androidopenloginfunneldevicesmonthly_options = {
   chart: {
-    renderTo: 'androidopenloginfunneldevicesweekly',
+    renderTo: 'androidopenloginfunneldevicesmonthly',
     type: 'column',
     zoomType: 'x',
     height: 500,
@@ -13,14 +13,14 @@ androidopenloginfunneldevicesweekly_options = {
     borderWidth: 1
   },
   title: {
-    text: 'Android Open Bundle Login Funnel Devices per Week'
+    text: 'Android Open Bundle Login Funnel Devices per Month'
   },
   subtitle: {
-    text: '(for the past 10 weeks)'
+    text: '(for the past 6 Months)'
   },
   tooltip: {
     formatter: function () {
-    var s = '<b>' + Highcharts.dateFormat('%b %e %Y', this.x) + '</b>: <br>' + Highcharts.numberFormat(this.y, 0, '', ',') + ' Devices';
+    var s = '<b>' + Highcharts.dateFormat('%b %Y', this.x) + '</b>: <br>' + Highcharts.numberFormat(this.y, 0, '', ',') + ' Devices';
 
     return s;
     }
@@ -36,17 +36,17 @@ androidopenloginfunneldevicesweekly_options = {
   },
   xAxis: {
     title: {
-      text: ''
+      text: 'Month'
     },
     type: 'datetime',
     dateTimeLabelFormats: {
-      month: '%b %e %Y',
+      month: '%b %Y',
     }
   },
   yAxis: {
     min: 0, // Minimum start at 0 on y-axis
     title: {
-      text: '# of Login Funnel Devices'
+      text: '# of Total Devices'
     }
   },
   plotOptions: {
@@ -61,7 +61,7 @@ androidopenloginfunneldevicesweekly_options = {
   series: []
 };
 
-$.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
+$.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesMonthly.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
   var prev_name = ''
@@ -71,7 +71,7 @@ $.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
     series = prev_series
     if (lineNo == linecnt) {
       console.log('End');
-      androidopenloginfunneldevicesweekly_options.series.push(series)
+      androidopenloginfunneldevicesmonthly_options.series.push(series)
       dummy = 1;
     }    
     else if (lineNo > 0) {
@@ -82,9 +82,9 @@ $.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
 
         var year = parseInt(items[1].split('-')[0])
         var month = parseInt(items[1].split('-')[1]) - 1 // offset months in JS
-        var day = parseInt(items[1].split('-')[2])
+        //var day = parseInt(items[1].split('-')[2])
         
-        series.data.push([Date.UTC(year,month,day),parseFloat(items[2])])
+        series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
 
         console.log(series);
 
@@ -94,7 +94,7 @@ $.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
         console.log('Start');
 
         if (prev_name != '') {
-          androidopenloginfunneldevicesweekly_options.series.push(series)  
+          androidopenloginfunneldevicesmonthly_options.series.push(series)  
         }
 
         var series = {
@@ -107,9 +107,9 @@ $.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
 
         var year = parseInt(items[1].split('-')[0])
         var month = parseInt(items[1].split('-')[1]) - 1 // offset months in JS
-        var day = parseInt(items[1].split('-')[2])
+        //var day = parseInt(items[1].split('-')[2])
 
-        series.data.push([Date.UTC(year,month,day),parseFloat(items[2])])
+        series.data.push([Date.UTC(year,month,1),parseFloat(items[2])])
         prev_series = series
 
         console.log(series);
@@ -118,7 +118,7 @@ $.get('csv/KPI_Robin_AndroidOpenLoginFunnelDevicesWeekly.csv', function(data) {
     }
   })
 
-androidopenloginfunneldevicesweekly = new Highcharts.Chart(androidopenloginfunneldevicesweekly_options);
+androidopenloginfunneldevicesmonthly = new Highcharts.Chart(androidopenloginfunneldevicesmonthly_options);
 
 });
 

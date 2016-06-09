@@ -3,9 +3,9 @@
 
 $(document).ready(function() {
 
-iosopenloginfunnelweekly_options = {
+iosopenloginfunnelmonthly_options = {
   chart: {
-    renderTo: 'iosopenloginfunnelweekly',
+    renderTo: 'iosopenloginfunnelmonthly',
     type: 'area',
     // zoomType: 'x',
     height: 500,
@@ -13,17 +13,24 @@ iosopenloginfunnelweekly_options = {
     borderWidth: 1
   },
   title: {
-    text: 'iOS Open Bundle Login Funnel per Week'
+    text: 'iOS Open Bundle Login Funnel per Month'
   },
   subtitle: {
-    text: '(for the past 10 weeks)'
+    text: '(for the past 6 Months)'
   },
   tooltip: {
     formatter: function () {
     /*var prevPoint = this.series.data[this.point.x - 1];*/
     /*var test = ProfileFillerView.[this.x].y*/
-    var s = '<b>' + this.series.name + ' (Week of ' + Highcharts.dateFormat('%b %e %Y', this.x) + ')</b>: <br>' + this.y+ ' % of Devices';
-
+    if (this.series.name != 'ActivityFeed' && this.series.name != 'EnterEmail') {
+       var s = '<b> Login Step: ' + this.series.name + '</b><br> <b>Month: ' + Highcharts.dateFormat('%b %Y', this.x) + '</b><br>' + Highcharts.numberFormat(this.point.count, 0, '', ',') + ' Devices <br>' + (this.y) + '% Step Drop Off <br>' + (this.point.total_drop) + '% Retention of Total Devices';  
+    }
+    else if (this.series.name == 'EnterEmail') {
+       var s = '<b> Login Step: ' + this.series.name + '</b><br> <b>Month: ' + Highcharts.dateFormat('%b %Y', this.x) + '</b><br>' + Highcharts.numberFormat(this.point.count, 0, '', ',') + ' Devices <br>' + (this.y) + '% Step Drop Off';  
+    }
+    else {
+       var s = '<b> Login Step: ' + this.series.name + '</b><br> <b>Month: ' + Highcharts.dateFormat('%b %Y', this.x) + '</b><br>' + Highcharts.numberFormat(this.point.count, 0, '', ',') + ' Devices <br>' + (this.point.total_drop) + '% Retention of Total Devices';
+    }
     return s;
     }
   },
@@ -38,18 +45,18 @@ iosopenloginfunnelweekly_options = {
   },
   xAxis: {
     title: {
-      text: 'Week Of'
+      text: 'Month'
     },
     type: 'datetime',
     dateTimeLabelFormats: {
-      month: '%b %e %Y',
+      month: '%b %Y',
     }
   },
   yAxis: {
-    min: 20, // Minimum start at 0 on y-axis
+    min: 0, // Minimum start at 0 on y-axis
     max: 100,
     title: {
-      text: '% Retention of Devices from Previous Login Step'
+      text: '% Retention of Total Devices'
     }
   },
   plotOptions: {
@@ -74,7 +81,7 @@ iosopenloginfunnelweekly_options = {
   series: []
 };
 
-$.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
+$.get('csv/KPI_Robin_iOSOpenLoginFunnelMonthly.csv', function(data) {
   var lines = data.split('\n')
   var linecnt = data.split('\n').length - 1;
   var prev_name = ''
@@ -84,7 +91,7 @@ $.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
     series = prev_series
     if (lineNo == linecnt) {
       console.log('End');
-      iosopenloginfunnelweekly_options.series.push(series)
+      iosopenloginfunnelmonthly_options.series.push(series)
       dummy = 1;
     }
         
@@ -96,9 +103,9 @@ $.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
 
         var year = parseInt(items[2].split('-')[0])
         var month = parseInt(items[2].split('-')[1]) - 1
-        var day = parseInt(items[2].split('-')[2])
+        //var day = parseInt(items[2].split('-')[2])
         
-        series.data.push([Date.UTC(year,month,day),parseFloat(items[3])])
+        series.data.push({x:Date.UTC(year,month,1),y:parseFloat(items[3]),total_drop:parseFloat(items[4]),count:parseFloat(items[5])})
 
         console.log(series);
 
@@ -107,7 +114,7 @@ $.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
         console.log('Start');
 
         if (prev_name != '') {
-          iosopenloginfunnelweekly_options.series.push(series)  
+          iosopenloginfunnelmonthly_options.series.push(series)  
         }
 
         var series = {
@@ -120,9 +127,9 @@ $.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
 
         var year = parseInt(items[2].split('-')[0])
         var month = parseInt(items[2].split('-')[1]) - 1
-        var day = parseInt(items[2].split('-')[2])
+        //var day = parseInt(items[2].split('-')[2])
 
-        series.data.push([Date.UTC(year,month,day),parseFloat(items[3])])
+        series.data.push({x:Date.UTC(year,month,1),y:parseFloat(items[3]),total_drop:parseFloat(items[4]),count:parseFloat(items[5])})
         prev_series = series
 
         console.log(series);
@@ -131,7 +138,7 @@ $.get('csv/KPI_Robin_iOSOpenLoginFunnelWeekly.csv', function(data) {
     }
   })
 
-iosopenloginfunnelweekly = new Highcharts.Chart(iosopenloginfunnelweekly_options);
+iosopenloginfunnelmonthly = new Highcharts.Chart(iosopenloginfunnelmonthly_options);
 
 });
 

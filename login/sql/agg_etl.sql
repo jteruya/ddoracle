@@ -39,7 +39,7 @@ join (select distinct aa.bundleid
       where te.applicationid is null
       ) b
 on a.bundle_id = lower(b.bundleid)
-join (select wk.week_starting
+/*join (select wk.week_starting
            , date
       from dashboard.calendar_wk wk
       join (select min(week_starting) as firstweek
@@ -49,9 +49,11 @@ join (select wk.week_starting
             ) weeklimit
       on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek
       ) c
-on a.created::date = c.date
+on a.created::date = c.date*/
 where a.identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
 and a.binary_version >= '6.3'
+and a.created >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
+and a.created < current_date
 ;
 
 
@@ -75,7 +77,7 @@ join (select distinct aa.bundleid
       where te.applicationid is null
       ) b
 on a.bundle_id = lower(b.bundleid)
-join (select wk.week_starting
+/*join (select wk.week_starting
            , date
       from dashboard.calendar_wk wk
       join (select min(week_starting) as firstweek
@@ -85,9 +87,11 @@ join (select wk.week_starting
             ) weeklimit
       on wk.week_starting >= weeklimit.firstweek and wk.week_starting <= weeklimit.lastweek
       ) c
-on a.created::date = c.date
+on a.created::date = c.date*/
 where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
 and a.binary_version >= '6.3'
+and a.created >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
+and a.created < current_date
 ;
 
 -- Creat Index for Login Views Staging Table
@@ -95,6 +99,7 @@ create index indx_kpi_login_view_metrics on dashboard.kpi_login_view_metrics (bu
 ;
 
 -- Get Login Actions
+/*
 drop table if exists dashboard.kpi_login_action_metrics
 ;
 
@@ -123,12 +128,14 @@ join (select wk.week_starting
 on a.created::date = c.date
 where a.identifier in ('accountSelectButton','anotherAccountButton','enterEmailTextField','submitEmailButton','enterPasswordTextField','submitPasswordButton','resetPasswordButton','cancelResetPasswordButton','submitResetPasswordButton','eventSelectButton','changeProfilePhotoButton','cancelProfilePhotoAction','enterFirstNameTextField','enterLastNameTextField','enterCompanyTextField','enterTitleTextField','addSocialNetworkToProfileButton','submitProfileButton','createProfileButton','emailSupport')
 and a.binary_version >= '6.3'
+and a.created >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
+and a.created < current_date
 ;
 
 -- Creat Index for Login Actions Staging Table
 create index indx_kpi_login_action_metrics on dashboard.kpi_login_action_metrics (bundle_id, device_id, device_type)
 ;
-
+*/
 
 -- Device/Bundle Level Checkpoint Staging Table
 drop table if exists dashboard.kpi_login_device_checkpoint_metrics;
@@ -138,90 +145,92 @@ select bundle_id
      , device_type
 
      -- Checkpoints
-     -- loginFlowStart (Initial - enterEmail)
+     , min(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') then created else null end) as loginFlowStartInitialMinDate
+     
+     -- loginFlowStart (Initial - enterEmail)     
      , min(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'enterEmail' then created else null end) as loginFlowStartInitialEnterEmailMinDate
-     , max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'enterEmail' then created else null end) as loginFlowStartInitialEnterEmailMaxDate
-     , count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'InitialView' = 'enterEmail' then session_id else null end) as loginFlowStartInitialEnterEmailSessionCnt
+     --, max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'enterEmail' then created else null end) as loginFlowStartInitialEnterEmailMaxDate
+     --, count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'InitialView' = 'enterEmail' then session_id else null end) as loginFlowStartInitialEnterEmailSessionCnt
 
      -- loginFlowStart (Initial - accountPicker)
      , min(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'accountPicker' then created else null end) as loginFlowStartInitialAccountPickerMinDate
-     , max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'accountPicker' then created else null end) as loginFlowStartInitialAccountPickerMaxDate
-     , count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'InitialView' = 'accountPicker' then session_id else null end) as loginFlowStartInitialAccountPickerSessionCnt
+     --, max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') and metadata->>'InitialView' = 'accountPicker' then created else null end) as loginFlowStartInitialAccountPickerMaxDate
+     --, count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'InitialView' = 'accountPicker' then session_id else null end) as loginFlowStartInitialAccountPickerSessionCnt
      
      -- accountPickerLoginSuccess (Initial - Open)
      , min(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessInitialOpenMinDate
-     , max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessInitialOpenMaxDate
-     , count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then session_id else null end) as accountPickerLoginSuccessInitialOpenSessionCnt
+     --, max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessInitialOpenMaxDate
+     --, count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then session_id else null end) as accountPickerLoginSuccessInitialOpenSessionCnt
 
      -- enterEmailLoginSuccess (Initial - Open)
      , min(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessInitialOpenMinDate
-     , max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessInitialOpenMaxDate
-     , count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then session_id else null end) as enterEmailLoginSuccessInitialOpenSessionCnt  
+     --, max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessInitialOpenMaxDate
+     --, count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'open' then session_id else null end) as enterEmailLoginSuccessInitialOpenSessionCnt  
 
      -- accountPickerLoginSuccess (Initial - Closed)
      , min(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessInitialClosedMinDate
-     , max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessInitialClosedMaxDate
-     , count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then session_id else null end) as accountPickerLoginSuccessInitialClosedSessionCnt
+     --, max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessInitialClosedMaxDate
+     --, count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then session_id else null end) as accountPickerLoginSuccessInitialClosedSessionCnt
 
      -- enterEmailLoginSuccess (Initial - Closed)
      , min(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessInitialClosedMinDate
-     , max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessInitialClosedMaxDate
-     , count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then session_id else null end) as enterEmailLoginSuccessInitialClosedSessionCnt  
+     --, max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessInitialClosedMaxDate
+     --, count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  and metadata->>'EventRegType' = 'closed' then session_id else null end) as enterEmailLoginSuccessInitialClosedSessionCnt  
      
      -- enterPasswordLoginSuccess (Initial)
      , min(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as enterPasswordLoginSuccessInitialMinDate
-     , max(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as enterPasswordLoginSuccessInitialMaxDate
-     , count(distinct case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as enterPasswordLoginSuccessInitialSessionCnt  
+     --, max(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as enterPasswordLoginSuccessInitialMaxDate
+     --, count(distinct case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as enterPasswordLoginSuccessInitialSessionCnt  
 
      -- eventPickerLoginSuccess (Initial)
      , min(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as eventPickerLoginSuccessInitialMinDate
-     , max(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as eventPickerLoginSuccessInitialMaxDate
-     , count(distinct case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as eventPickerLoginSuccessInitialSessionCnt  
+     --, max(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as eventPickerLoginSuccessInitialMaxDate
+     --, count(distinct case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as eventPickerLoginSuccessInitialSessionCnt  
 
      -- profileFillerLoginSuccess (Initial)
      , min(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as profileFillerLoginSuccessInitialMinDate
-     , max(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as profileFillerLoginSuccessInitialMaxDate
-     , count(distinct case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as profileFillerLoginSuccessInitialSessionCnt  
+     --, max(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then created else null end) as profileFillerLoginSuccessInitialMaxDate
+     --, count(distinct case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true')  then session_id else null end) as profileFillerLoginSuccessInitialSessionCnt  
 
      -- loginFlowStart (NonInitial)
      , min(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false')  then created else null end) as loginFlowStartNonInitialMinDate
-     , max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as loginFlowStartNonInitialMaxDate
-     , count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as loginFlowStartNonInitialSessionCnt
+     --, max(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as loginFlowStartNonInitialMaxDate
+     --, count(distinct case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as loginFlowStartNonInitialSessionCnt
      
      -- accountPickerLoginSuccess (NonInitial - Open)
      , min(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessNonInitialOpenMinDate
-     , max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessNonInitialOpenMaxDate
-     , count(distinct case when identifier = 'accountPickerLoginSuccess' and metadata->>'InitialLogin' = 'false' and metadata->>'EventRegType' = 'open' then session_id else null end) as accountPickerLoginSuccessNonInitialOpenSessionCnt
+     --, max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as accountPickerLoginSuccessNonInitialOpenMaxDate
+     --, count(distinct case when identifier = 'accountPickerLoginSuccess' and metadata->>'InitialLogin' = 'false' and metadata->>'EventRegType' = 'open' then session_id else null end) as accountPickerLoginSuccessNonInitialOpenSessionCnt
 
      -- enterEmailLoginSuccess (NonInitial - Open)
      , min(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessNonInitialOpenMinDate
-     , max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessNonInitialOpenMaxDate
-     , count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then session_id else null end) as enterEmailLoginSuccessNonInitialOpenSessionCnt  
+     --, max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then created else null end) as enterEmailLoginSuccessNonInitialOpenMaxDate
+     --, count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'open' then session_id else null end) as enterEmailLoginSuccessNonInitialOpenSessionCnt  
 
      -- accountPickerLoginSuccess (NonInitial - Closed)
      , min(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessNonInitialClosedMinDate
-     , max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessNonInitialClosedMaxDate
-     , count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then session_id else null end) as accountPickerLoginSuccessNonInitialClosedSessionCnt
+     --, max(case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as accountPickerLoginSuccessNonInitialClosedMaxDate
+     --, count(distinct case when identifier = 'accountPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then session_id else null end) as accountPickerLoginSuccessNonInitialClosedSessionCnt
 
      -- enterEmailLoginSuccess (NonInitial - Closed)
      , min(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessNonInitialClosedMinDate
-     , max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessNonInitialClosedMaxDate
-     , count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then session_id else null end) as enterEmailLoginSuccessNonInitialClosedSessionCnt  
+     --, max(case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then created else null end) as enterEmailLoginSuccessNonInitialClosedMaxDate
+     --, count(distinct case when identifier = 'enterEmailLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') and metadata->>'EventRegType' = 'closed' then session_id else null end) as enterEmailLoginSuccessNonInitialClosedSessionCnt  
      
      -- enterPasswordLoginSuccess (NonInitial)
      , min(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as enterPasswordLoginSuccessNonInitialMinDate
-     , max(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as enterPasswordLoginSuccessNonInitialMaxDate
-     , count(distinct case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as enterPasswordLoginSuccessNonInitialSessionCnt  
+     --, max(case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as enterPasswordLoginSuccessNonInitialMaxDate
+     --, count(distinct case when identifier = 'enterPasswordLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as enterPasswordLoginSuccessNonInitialSessionCnt  
 
      -- eventPickerLoginSuccess (NonInitial)
      , min(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as eventPickerLoginSuccessNonInitialMinDate
-     , max(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as eventPickerLoginSuccessNonInitialMaxDate
-     , count(distinct case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as eventPickerLoginSuccessNonInitialSessionCnt  
+     --, max(case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as eventPickerLoginSuccessNonInitialMaxDate
+     --, count(distinct case when identifier = 'eventPickerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as eventPickerLoginSuccessNonInitialSessionCnt  
 
      -- profileFillerLoginSuccess (NonInitial)
      , min(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as profileFillerLoginSuccessNonInitialMinDate
-     , max(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as profileFillerLoginSuccessNonInitialMaxDate
-     , count(distinct case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as profileFillerLoginSuccessNonInitialSessionCnt         
+     --, max(case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then created else null end) as profileFillerLoginSuccessNonInitialMaxDate
+     --, count(distinct case when identifier = 'profileFillerLoginSuccess' and (metadata->>'InitialLogin' = 'false' or metadata->>'Initiallogin' = 'false') then session_id else null end) as profileFillerLoginSuccessNonInitialSessionCnt         
 
 from dashboard.kpi_login_checkpoint_metrics
 -- Filter out SSO bundles
@@ -241,38 +250,38 @@ select bundle_id
      -- Views & Actions
      -- accountPicker (View)
      , min(case when identifier = 'accountPicker' then created else null end) as accountPickerMinDate
-     , max(case when identifier = 'accountPicker' then created else null end) as accountPickerMaxDate
-     , count(distinct case when identifier = 'accountPicker' then session_id else null end) as accountPickerSessionCnt  
+     --, max(case when identifier = 'accountPicker' then created else null end) as accountPickerMaxDate
+     --, count(distinct case when identifier = 'accountPicker' then session_id else null end) as accountPickerSessionCnt  
      
      -- enterEmail (View)
      , min(case when identifier = 'enterEmail' then created else null end) as enterEmailMinDate
-     , max(case when identifier = 'enterEmail' then created else null end) as enterEmailMaxDate
-     , count(distinct case when identifier = 'enterEmail' then session_id else null end) as enterEmailSessionCnt
+     --, max(case when identifier = 'enterEmail' then created else null end) as enterEmailMaxDate
+     --, count(distinct case when identifier = 'enterEmail' then session_id else null end) as enterEmailSessionCnt
        
      -- enterPassword (View)
      , min(case when identifier = 'enterPassword' then created else null end) as enterPasswordMinDate
-     , max(case when identifier = 'enterPassword' then created else null end) as enterPasswordMaxDate
-     , count(distinct case when identifier = 'enterPassword' then session_id else null end) as enterPasswordSessionCnt  
+     --, max(case when identifier = 'enterPassword' then created else null end) as enterPasswordMaxDate
+     --, count(distinct case when identifier = 'enterPassword' then session_id else null end) as enterPasswordSessionCnt  
     
      -- resetPassword (View)
      , min(case when identifier = 'resetPassword' then created else null end) as resetPasswordMinDate
-     , max(case when identifier = 'resetPassword' then created else null end) as resetPasswordMaxDate
-     , count(distinct case when identifier = 'resetPassword' then session_id else null end) as resetPasswordSessionCnt       
+     --, max(case when identifier = 'resetPassword' then created else null end) as resetPasswordMaxDate
+     --, count(distinct case when identifier = 'resetPassword' then session_id else null end) as resetPasswordSessionCnt       
              
       -- eventPicker (View)
      , min(case when identifier = 'eventPicker' then created else null end) as eventPickerMinDate
-     , max(case when identifier = 'eventPicker' then created else null end) as eventPickerMaxDate
-     , count(distinct case when identifier = 'eventPicker' then session_id else null end) as eventPickerSessionCnt  
+     --, max(case when identifier = 'eventPicker' then created else null end) as eventPickerMaxDate
+     --, count(distinct case when identifier = 'eventPicker' then session_id else null end) as eventPickerSessionCnt  
      
      -- eventProfileChoice (View)
      , min(case when identifier = 'eventProfileChoice' then created else null end) as eventProfileChoiceMinDate
-     , max(case when identifier = 'eventProfileChoice' then created else null end) as eventProfileChoiceMaxDate
-     , count(distinct case when identifier = 'eventProfileChoice' then session_id else null end) as eventProfileChoiceSessionCnt  
+     --, max(case when identifier = 'eventProfileChoice' then created else null end) as eventProfileChoiceMaxDate
+     --, count(distinct case when identifier = 'eventProfileChoice' then session_id else null end) as eventProfileChoiceSessionCnt  
     
      -- profileFiller (View)
      , min(case when identifier = 'profileFiller' then created else null end) as profileFillerMinDate
-     , max(case when identifier = 'profileFiller' then created else null end) as profileFillerMaxDate
-     , count(distinct case when identifier = 'profileFiller' then session_id else null end) as profileFillerSessionCnt  
+     --, max(case when identifier = 'profileFiller' then created else null end) as profileFillerMaxDate
+     --, count(distinct case when identifier = 'profileFiller' then session_id else null end) as profileFillerSessionCnt  
              
 from dashboard.kpi_login_view_metrics
 -- Filter out SSO bundles
@@ -282,6 +291,7 @@ where bundle_id not in (select distinct bundle_id
 group by 1,2,3
 ;
 
+/*
 -- Device/Bundle Level Action Staging Table
 drop table if exists dashboard.kpi_login_device_action_metrics;
 create table dashboard.kpi_login_device_action_metrics as
@@ -415,15 +425,18 @@ where bundle_id not in (select distinct bundle_id
                         where identifier = 'remoteSsoLogin')
 group by 1,2,3
 ;
+*/
 
 -- Create a Device Spine
 drop table if exists dashboard.kpi_login_devices;
 create table dashboard.kpi_login_devices as
+/*
 select distinct bundle_id
      , device_id
      , device_type
 from dashboard.kpi_login_device_action_metrics
 union
+*/
 select distinct bundle_id
      , device_id
      , device_type
@@ -442,52 +455,53 @@ select device.device_id
      , device.bundle_id
      , device.device_type
      
+     , checkpoint.loginFlowStartInitialMinDate
      , checkpoint.loginFlowStartInitialEnterEmailMinDate
      , checkpoint.loginFlowStartInitialAccountPickerMinDate
      , checkpoint.loginFlowStartNonInitialMinDate
      
      -- Account Picker
      , view.accountPickerMinDate
-     , action.accountSelectButtonMinDate
+     /*, action.accountSelectButtonMinDate
      , action.anotherAccountButtonMinDate
-     , action.emailSupportAccountPickerMinDate
+     , action.emailSupportAccountPickerMinDate*/
      , checkpoint.accountPickerLoginSuccessInitialOpenMinDate
      , checkpoint.accountPickerLoginSuccessInitialClosedMinDate
      
      -- Enter Email
      , view.enterEmailMinDate
-     , action.enterEmailTextFieldMinDate
+     /*, action.enterEmailTextFieldMinDate
      , action.submitEmailButtonMinDate
-     , action.emailSupportEnterEmailMinDate
+     , action.emailSupportEnterEmailMinDate*/
      , checkpoint.enterEmailLoginSuccessInitialOpenMinDate
      , checkpoint.enterEmailLoginSuccessInitialClosedMinDate
      
      -- Enter Password
      , view.enterPasswordMinDate
-     , action.enterPasswordTextFieldMinDate
+     /*, action.enterPasswordTextFieldMinDate
      , action.submitPasswordButtonMinDate
      , action.resetPasswordButtonMinDate
-     , action.emailSupportEnterPasswordMinDate
+     , action.emailSupportEnterPasswordMinDate*/
      , checkpoint.enterPasswordLoginSuccessInitialMinDate
       
      -- Reset Password     
      , view.resetPasswordMinDate
-     , action.cancelResetPasswordButtonMinDate
-     , action.submitResetPasswordButtonMinDate
+     /*, action.cancelResetPasswordButtonMinDate
+     , action.submitResetPasswordButtonMinDate*/
 
      -- Event Picker    
      , view.eventPickerMinDate
-     , action.eventSelectButtonMinDate
+     --, action.eventSelectButtonMinDate
      , checkpoint.eventPickerLoginSuccessInitialMinDate
      
      -- Event Choice
      , view.eventProfileChoiceMinDate
-     , action.createProfileButtonManualMinDate
-     , action.createProfileButtonLinkedInEPCMinDate
+     --, action.createProfileButtonManualMinDate
+     --, action.createProfileButtonLinkedInEPCMinDate
      
      -- Profile Filler
      , view.profileFillerMinDate
-     , action.changeProfilePhotoButtonMinDate
+     /*, action.changeProfilePhotoButtonMinDate
      , action.cancelProfilePhotoActionMinDate
      , action.createProfileButtonLinkedInPFMinDate
      , action.enterFirstNameTextFieldMinDate
@@ -495,7 +509,7 @@ select device.device_id
      , action.enterCompanyTextFieldMinDate
      , action.enterTitleTextFieldMinDate
      , action.addSocialNetworkToProfileButtonMinDate
-     , action.submitProfileButtonMinDate
+     , action.submitProfileButtonMinDate*/
      , checkpoint.profileFillerLoginSuccessInitialMinDate
      
 from dashboard.kpi_login_devices device
@@ -505,9 +519,11 @@ and device.bundle_id = checkpoint.bundle_id
 left join dashboard.kpi_login_device_view_metrics view
 on device.device_id = view.device_id
 and device.bundle_id = view.bundle_id
+/*
 left join dashboard.kpi_login_device_action_metrics action
 on device.device_id = action.device_id
 and device.bundle_id = action.bundle_id
+*/
 ;
 
 -- Get 1st Session for Device
