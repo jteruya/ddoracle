@@ -143,6 +143,8 @@ create table dashboard.kpi_login_device_checkpoint_metrics as
 select bundle_id
      , device_id
      , device_type
+     
+     , min(binary_version) as binary_version
 
      -- Checkpoints
      , min(case when identifier = 'loginFlowStart' and (metadata->>'InitialLogin' = 'true' or metadata->>'Initiallogin' = 'true') then created else null end) as loginFlowStartInitialMinDate
@@ -246,6 +248,8 @@ create table dashboard.kpi_login_device_view_metrics as
 select bundle_id
      , device_id
      , device_type
+
+     , min(binary_version) as binary_version
     
      -- Views & Actions
      -- accountPicker (View)
@@ -437,15 +441,24 @@ select distinct bundle_id
 from dashboard.kpi_login_device_action_metrics
 union
 */
+select bundle_id
+     , device_id
+     , device_type
+     , min(binary_version) as binary_version
+from (
 select distinct bundle_id
      , device_id
      , device_type
+     , binary_version
 from dashboard.kpi_login_device_view_metrics
 union
 select distinct bundle_id
-     ,device_id
+     , device_id
      , device_type
+     , binary_version
 from dashboard.kpi_login_device_checkpoint_metrics
+) a
+group by 1,2,3
 ;
 
 -- Login Funnel at the Device/Bundle Level
@@ -454,6 +467,7 @@ create table dashboard.kpi_login_devices_checklist as
 select device.device_id
      , device.bundle_id
      , device.device_type
+     , device.binary_version
      
      , checkpoint.loginFlowStartInitialMinDate
      , checkpoint.loginFlowStartInitialEnterEmailMinDate
