@@ -23,6 +23,10 @@ select lower(a.bundleid) as bundle_id
          when count(case when b.canregister = false then 1 else null end) > 0 and count(case when b.canregister = true then 1 else null end) = 0 then 'closed'
          else 'mixed'
        end as bundle_type
+     , min(b.startdate) as firsteventsstartdate
+     , max(b.startdate) as lasteventstartdate
+     , min(b.enddate) as firsteventenddate
+     , max(b.enddate) as lasteventenddate
 from login_bundles a
 join authdb_applications b
 on a.bundleid = b.bundleid
