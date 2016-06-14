@@ -21,8 +21,8 @@
 kpi_domain="login"
 wd="oracle"
 etl="${kpi_domain}_etl"
-#domain_wd="$HOME/${wd}/${kpi_domain}"
-domain_wd="$HOME/repo/${wd}/${kpi_domain}"
+domain_wd="$HOME/${wd}/${kpi_domain}"
+#domain_wd="$HOME/repo/${wd}/${kpi_domain}"
 
 # Report fields
 kpi_ios_open_login_funnel_devices_monthly_report="KPI_Robin_iOSOpenLoginFunnelDevicesMonthly"
@@ -36,8 +36,8 @@ kpi_android_closed_login_funnel_monthly_report="KPI_Robin_AndroidClosedLoginFunn
 
 # Generic Tools/Scripts
 run_sql_robin='psql -h 10.223.192.6 -p 5432 -U etl -A -F"," analytics -f '
-#transpose="python $HOME/tools/transpose.py"
-transpose="python $HOME/repo/tools/transpose.py"
+transpose="python $HOME/tools/transpose.py"
+#transpose="python $HOME/repo/tools/transpose.py"
 index_insights_fill="python ${kpi_domain_wd}/index_insights_fill.py"
 email_reports_wd="$HOME/email_reports"
 
@@ -126,10 +126,10 @@ echo "--------------------------------------------------------------------------
 echo "PRODUCTIONALIZE - Copy Dashboard files for Production ($kpi_domain) : " `date` 
 echo "-------------------------------------------------------------------------------------------------"
 
-#cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
-#cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
-#cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
-#cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
+cp -rf $domain_wd/index.html /var/www/html/product/dashboards/$kpi_domain/index.html
+cp -rf $domain_wd/js/* /var/www/html/product/dashboards/$kpi_domain/js
+cp -rf $domain_wd/image/* /var/www/html/product/dashboards/$kpi_domain/image
+cp -rf $domain_wd/csv/* /var/www/html/product/dashboards/$kpi_domain/csv
 
 # ====================================================================================================== ========== -
 #  6  #
