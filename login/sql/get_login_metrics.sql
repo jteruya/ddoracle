@@ -40,7 +40,12 @@ insert into dashboard.kpi_login_checkpoint_metrics_STG (
   join login_bundles b
   on a.bundle_id = lower(b.bundleid)
   where a.identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
-  and a.binary_version >= '6.3'
+  and a.binary_version >= '6'
+  and a.binary_version not like '6.0%'
+  and a.binary_version not like '6.1'
+  and a.binary_version not like '6.1.%' 
+  and a.binary_version not like '6.2'
+  and a.binary_version not like '6.2.%' 
   and a.created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
   and a.batch_id >= (select max(batch_id) from dashboard.kpi_login_checkpoint_metrics)
 )
@@ -53,7 +58,12 @@ insert into dashboard.kpi_login_view_metrics_STG (
   join login_bundles b
   on a.bundle_id = lower(b.bundleid)
   where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
-  and a.binary_version >= '6.3'
+  and a.binary_version >= '6'
+  and a.binary_version not like '6.0%'
+  and a.binary_version not like '6.1'
+  and a.binary_version not like '6.1.%' 
+  and a.binary_version not like '6.2'
+  and a.binary_version not like '6.2.%' 
   and a.created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
   and a.batch_id >= (select max(batch_id) from dashboard.kpi_login_checkpoint_metrics)
 )
