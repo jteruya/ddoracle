@@ -9,7 +9,7 @@ $(function () {
             text: 'App Session Count Trend'
         },
          subtitle: {
-            text: 'By Week (All Events)'
+            text: 'By Week (All US Server Events)'
         },
         xAxis: {
             type: 'category'
