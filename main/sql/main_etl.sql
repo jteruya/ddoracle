@@ -23,7 +23,7 @@ AND StartDate IS NOT NULL AND EndDate IS NOT NULL;
 DROP TABLE IF EXISTS dashboard.Session_Durations_Weekly;
 CREATE TABLE dashboard.Session_Durations_Weekly TABLESPACE FastStorage AS 
 SELECT
-CAST(EXTRACT(YEAR FROM b.StartDate) AS INT) || '-' || CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) AS YYYY_WW,
+CAST(EXTRACT(YEAR FROM b.StartDate) AS INT) || CASE WHEN CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) < 10 THEN '-0' ELSE '-' END || CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) AS YYYY_WW,
 a.*,
 CAST(EXTRACT(WEEK FROM CURRENT_DATE) AS INT) - CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) AS WeeksPast
 FROM EventCube.Session_Durations a
@@ -37,7 +37,7 @@ CREATE INDEX ndx_session_durations_weekly ON dashboard.Session_Durations_Weekly 
 DROP TABLE IF EXISTS dashboard.App_Durations_Weekly;
 CREATE TABLE dashboard.App_Durations_Weekly TABLESPACE FastStorage AS 
 SELECT
-CAST(EXTRACT(YEAR FROM b.StartDate) AS INT) || '-' || CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) AS YYYY_WW,
+CAST(EXTRACT(YEAR FROM b.StartDate) AS INT) || CASE WHEN CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) < 10 THEN '-0' ELSE '-' END || CAST(EXTRACT(WEEK FROM b.StartDate) AS INT) AS YYYY_WW,
 a.*
 FROM EventCube.Session_Durations a
 JOIN AuthDB_Applications b ON UPPER(a.ApplicationId) = b.ApplicationId
