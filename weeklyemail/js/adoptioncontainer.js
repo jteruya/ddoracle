@@ -9,7 +9,7 @@ $(function () {
             text: 'Adoption % Trend'
         },
          subtitle: {
-            text: 'By Week (Closed Reg Events Only)'
+            text: 'By Week (Closed Reg US Server Events Only)'
         },
         xAxis: {
             type: 'category'
