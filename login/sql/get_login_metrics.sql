@@ -1,3 +1,7 @@
+-- Increase Timeout Window to 180 minutes
+SET statement_timeout = '180 min';
+COMMIT;
+
 -- Get the List of all Non-Test Bundles
 create temporary table login_bundles as
 select distinct aa.bundleid

@@ -1,3 +1,7 @@
+-- Increase Timeout Window to 180 minutes
+SET statement_timeout = '180 min';
+COMMIT;
+
 -- Get 1st Session for Device
 drop table if exists dashboard.kpi_login_devices_checklist_firstsessions;
 create table dashboard.kpi_login_devices_checklist_firstsessions as

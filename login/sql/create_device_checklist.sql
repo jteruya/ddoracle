@@ -1,3 +1,7 @@
+-- Increase Timeout Window to 180 minutes
+SET statement_timeout = '180 min';
+COMMIT;
+
 -- Create Temporary Device Checkpoint Checklist Table
 create temporary table kpi_login_device_checkpoint_metrics as
 select bundle_id
