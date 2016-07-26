@@ -22,34 +22,70 @@ where te.applicationid is null
 
 -- Insert into Checkpoint Metrics Final Table
 insert into dashboard.kpi_login_checkpoint_metrics (
-	select a.*
-	from fact_checkpoints_live a
+	select a.batch_id
+	     , a.row_id
+	     , a.tinserted
+	     , a.created
+	     , a.bundle_id
+	     , a.application_id
+	     , a.global_user_id
+	     , a.device_id
+	     , a.device_os_version
+	     , a.binary_version_new
+	     , a.mmm_info
+	     , a.identifier
+	     , a.metadata
+	     , a.schema_version
+	     , a.session_id
+	     , a.event_id
+	     , a.metric_type
+	     , a.anonymous_id
+	     , a.device_type
+	     , a.metric_version
+	from (select *
+	           , fn_parent_binaryversion(binary_version) as binary_version_new
+	      from fact_checkpoints_live
+	      where identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
+	      and binary_version >= '6'
+	      and created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '5' month
+	      and created::date <= current_date) a
 	join login_bundles b
 	on a.bundle_id = lower(b.bundleid)
-	where a.identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
-	and a.binary_version >= '6'
-	and a.binary_version not like '6.0%'
-	and a.binary_version not like '6.1'
-	and a.binary_version not like '6.1.%'	
-	and a.binary_version not like '6.2'
-	and a.binary_version not like '6.2.%'	
-	and a.created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
+	where binary_version_new >= '6.03'
 )
 ;
 
 -- Insert into View Metrics Final Table
 insert into dashboard.kpi_login_view_metrics (
-	select a.*
-	from fact_views_live a
+	select a.batch_id
+	     , a.row_id
+	     , a.tinserted
+	     , a.created
+	     , a.bundle_id
+	     , a.application_id
+	     , a.global_user_id
+	     , a.device_id
+	     , a.device_os_version
+	     , a.binary_version_new
+	     , a.mmm_info
+	     , a.identifier
+	     , a.metadata
+	     , a.schema_version
+	     , a.session_id
+	     , a.event_id
+	     , a.metric_type
+	     , a.anonymous_id
+	     , a.device_type
+	     , a.metric_version
+	from (select *
+	           , fn_parent_binaryversion(binary_version) as binary_version_new
+	      from fact_views_live
+	      where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
+	      and binary_version >= '6'
+	      and created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '5' month
+	      and created::date <= current_date) a
 	join login_bundles b
 	on a.bundle_id = lower(b.bundleid)
-	where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
-	and a.binary_version >= '6'
-	and a.binary_version not like '6.0%'
-	and a.binary_version not like '6.1'
-	and a.binary_version not like '6.1.%'	
-	and a.binary_version not like '6.2'
-	and a.binary_version not like '6.2.%'	
-	and a.created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '6' month
+	where binary_version_new >= '6.03'	
 )
 ;
