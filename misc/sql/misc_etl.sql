@@ -1,11 +1,12 @@
 --Get the List of Sessions and their related Metadata
 DROP TABLE IF EXISTS dashboard.kpi_social_metrics_session_os_version;
 CREATE TABLE dashboard.kpi_social_metrics_session_os_version TABLESPACE FastStorage AS
-SELECT UserId, AppTypeId, BinaryVersion, StartDate AS Created, CAST(EXTRACT(YEAR FROM StartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM StartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM StartDate) AS INT) AS YYYY_MM
+SELECT UserId, CASE WHEN Src = 'newMetrics_Live' AND AppTypeId IS NULL THEN 4 ELSE AppTypeId END AS AppTypeId, BinaryVersion, StartDate AS Created, CAST(EXTRACT(YEAR FROM StartDate) AS INT) || '-' || CASE WHEN CAST(EXTRACT(MONTH FROM StartDate) AS INT) < 10 THEN '0' ELSE '' END || CAST(EXTRACT(MONTH FROM StartDate) AS INT) AS YYYY_MM
 FROM EventCube.Sessions
 WHERE StartDate <= CURRENT_DATE --Only Session that have started in past 13 months
 AND StartDate >= CAST(EXTRACT(YEAR FROM CURRENT_DATE - INTERVAL'13 months')||'-'||EXTRACT(MONTH FROM CURRENT_DATE - INTERVAL'13 months')||'-01 00:00:00' AS TIMESTAMP)
 ;
+
 
 --CREATE INDEX ndx_kpi_social_metrics_session_os_version ON dashboard.kpi_social_metrics_session_os_version(YYYY_MM,AppTypeId) TABLESPACE FastStorage;
 --CREATE INDEX ndx_kpi_social_metrics_session_os_version_user ON dashboard.kpi_social_metrics_session_os_version(UserId) TABLESPACE FastStorage;
