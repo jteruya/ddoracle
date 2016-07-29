@@ -1,4 +1,3 @@
-EXPLAIN
 SELECT EventType, YYYY_MM, PCT_Adoption 
 
 FROM (
@@ -27,7 +26,7 @@ AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --
 ) t 
 LEFT JOIN Integrations.implementation__c sfdc ON t.ApplicationId = sfdc.sf_event_id_cms__c
 WHERE StartDate <= CURRENT_DATE --Only Events that have already started
-AND StartDate >= CURRENT_DATE - INTERVAL'13 months'
+AND StartDate >= CURRENT_DATE - INTERVAL'13' month
 GROUP BY 1,2,3,4
 
 ) t 
@@ -58,7 +57,7 @@ AND app.ApplicationId NOT IN (SELECT ApplicationId FROM EventCube.TestEvents) --
 
 ) t 
 WHERE StartDate <= CURRENT_DATE --Only Events that have already started
-AND StartDate >= CURRENT_DATE - INTERVAL'13 months'
+AND StartDate >= CURRENT_DATE - INTERVAL'13' month
 GROUP BY 1,2,3,4
 
 ) base
