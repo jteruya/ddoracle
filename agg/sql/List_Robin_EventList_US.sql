@@ -4,27 +4,26 @@ SELECT
   CAST(a.StartDate AS DATE) AS "Start Date", 
   CAST(a.EndDate AS DATE) AS "End Date", 
   CASE
-    WHEN sfdc.EventType = 'Expo (<2:1 session:exhibitor ratio)' THEN 'Expo'
-    WHEN sfdc.EventType = 'Conference (>2:1 session:exhibitor ratio)' THEN 'Conference'
-    WHEN sfdc.EventType = 'Corporate External' THEN 'Corp. External'
-    WHEN sfdc.EventType = 'Corporate Internal' THEN 'Corp. Internal'
-    WHEN sfdc.EventType IS NOT NULL THEN sfdc.EventType
-    WHEN sfdc.EventType IS NULL THEN '_Unknown'
+    WHEN a.EventType = 'Expo (<2:1 session:exhibitor ratio)' THEN 'Expo'
+    WHEN a.EventType = 'Conference (>2:1 session:exhibitor ratio)' THEN 'Conference'
+    WHEN a.EventType = 'Corporate External' THEN 'Corp. External'
+    WHEN a.EventType = 'Corporate Internal' THEN 'Corp. Internal'
+    WHEN a.EventType IS NOT NULL THEN a.EventType
+    WHEN a.EventType IS NULL THEN '_Unknown'
   END AS "Type", 
   CASE 
-    WHEN a.CanRegister = 'true' THEN 'Open' 
+    WHEN a.OpenEvent = 1 THEN 'Open' 
     ELSE 'Closed' 
   END AS "Open / Closed", 
-  b.ActiveUsers AS "Active Users", 
+  a.Users AS "Active Users", 
   CASE 
     WHEN te.ApplicationId IS NOT NULL THEN 'Y' 
     ELSE 'N' 
   END AS "Marked as Test App"
-FROM AuthDB_Applications a
-JOIN (SELECT ApplicationId, COUNT(*) AS ActiveUsers FROM EventCube.Agg_Session_Per_AppUser GROUP BY 1) b ON a.ApplicationId = b.ApplicationId
+FROM EventCube.EventCubeSummary a
 LEFT JOIN EventCube.TestEvents te ON a.ApplicationId = te.ApplicationId
-LEFT JOIN EventCube.V_DimEventsSFDC sfdc ON a.ApplicationId = sfdc.ApplicationId 
 WHERE a.StartDate < CURRENT_DATE
 AND a.StartDate >= CURRENT_DATE - INTERVAL'4 months'
 ORDER BY a.StartDate DESC
+;
 
