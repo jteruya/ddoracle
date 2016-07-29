@@ -87,7 +87,7 @@ echo "--------------------------------------------------------------------------
 $run_sql_robin $domain_wd/sql/$kpi_activeuserspermonth_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_activeuserspermonth_report.csv 
 $run_sql_robin $domain_wd/sql/$kpi_eventspermonth_us_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_eventspermonth_us_report.csv 
 # $run_sql_robin $domain_wd/sql/$kpi_eventspermonth_eu_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_eventspermonth_eu_report.csv 
-$run_sql_robin $domain_wd/sql/$kpi_metricspermonth_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_metricspermonth_report.csv 
+# $run_sql_robin $domain_wd/sql/$kpi_metricspermonth_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$kpi_metricspermonth_report.csv 
 $run_sql_robin $domain_wd/sql/$useventlist_report.sql | sed \$d | sed 's/\"//g' > $domain_wd/csv/$useventlist_report.csv 
 
 # ====================================================================================================== ========== 3b
