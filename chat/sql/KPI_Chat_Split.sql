@@ -1,7 +1,7 @@
 --Split the Users by interaction with Mesaging and identify their Session Counts per group
 SELECT 
   --t.ApplicationId AS "ApplicationId", 
-  app.Name AS "Event",
+  regexp_replace(app.Name, ',', '', 'g') AS "Event",
   CAST(b.StartDate AS DATE) AS "Start",
   CAST(b.EndDate AS DATE) AS "End",    
   MessagingInd AS "Relation to Messaging?", 
