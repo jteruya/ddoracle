@@ -1,5 +1,5 @@
 SELECT 
-  a."Event",
+  regexp_replace(a."Event", ',', '', 'g'),
   CAST(b.StartDate AS DATE) AS "Start",
   CAST(b.EndDate AS DATE) AS "End",  
   a."Total Rooms",

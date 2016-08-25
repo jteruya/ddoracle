@@ -55,6 +55,7 @@ echo "TRANSFORMATION ($kpi_domain) : " `date`
 echo "-------------------------------------------------------------------------------------------------"
 
 echo "Running $etl.sql."
+$run_sql_robin $domain_wd/sql/get_chat_metrics.sql
 $run_sql_robin $domain_wd/sql/$etl.sql
 
 # ====================================================================================================== ========== 2

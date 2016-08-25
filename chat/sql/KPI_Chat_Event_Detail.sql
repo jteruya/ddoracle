@@ -2,7 +2,7 @@ SELECT
   a."ApplicationId", 
   CAST(b.StartDate AS DATE) AS "Start",
   CAST(b.EndDate AS DATE) AS "End",  
-  a."Event",
+  regexp_replace(a."Event", ',', '', 'g'),
   a."Total Rooms",
   COALESCE(a."% Rooms with any Messages",0.00) AS "% Rooms with any Messages",
   COALESCE(a."% Rooms with 2-way Conversation",0.00) AS "% Rooms with 2-way Conversation",

@@ -2,7 +2,7 @@
 --Set of all Events
 CREATE OR REPLACE VIEW dashboard.Chat_Dim_Events AS
 SELECT ApplicationId, Name, EventType, StartDate, EndDate FROM AuthDB_Applications
-WHERE UPPER(ApplicationId) IN (SELECT DISTINCT ApplicationId FROM Report.NewMetrics_Actions_MenuItem WHERE Tapped = 'Menu - Messages');
+WHERE UPPER(ApplicationId) IN (SELECT ECS.ApplicationId FROM EventCube.EventCubeSummary ECS LEFT JOIN EventCube.TestEvents TE ON ECS.ApplicationId = TE.ApplicationId WHERE TE.ApplicationID IS NULL AND ECS.DirectMessaging = 1);
 --====================================================================================================
 
 --All Users tied to these Events (with DD flagging)
@@ -50,30 +50,31 @@ FROM (
 DROP TABLE IF EXISTS dashboard.Chat_Fact_MessagesSent;
 CREATE TABLE dashboard.Chat_Fact_MessagesSent AS
 SELECT 
-e.ApplicationId, 
+UPPER(e.Application_Id) AS ApplicationId, 
 e.Created,
-e.ChannelId,
+e.Channel_Id,
 iu.UserId AS S_UserId,
 rm.UserId AS R_UserId,
-CASE WHEN e.ChannelId IS NULL THEN 1 ELSE 0 END AS MessageSent_Bug
-FROM Report.NewMetrics_Actions_Chat e
-JOIN AuthDB_IS_Users iu ON e.ApplicationId = iu.ApplicationId AND e.GlobalUserId = iu.GlobalUserId
-LEFT JOIN channels.Members rm ON e.ChannelId = rm.ChannelId AND iu.UserId <> rm.UserId
-WHERE Tapped IN ('Chat (submit)')
+CASE WHEN e.Channel_Id IS NULL THEN 1 ELSE 0 END AS MessageSent_Bug
+FROM dashboard.kpi_chat_action_metrics e
+JOIN AuthDB_IS_Users iu ON e.Application_Id = LOWER(iu.ApplicationId) AND e.Global_User_Id = LOWER(iu.GlobalUserId)
+LEFT JOIN channels.Members rm ON e.Channel_Id = rm.ChannelId AND iu.UserId <> rm.UserId
+WHERE Identifier = 'chatTextButton'
+--AND Metadata->>'Type' = 'submit'
 AND iu.IsDisabled = 0
-AND e.ApplicationId IN (SELECT ApplicationId FROM dashboard.Chat_Dim_Events);
+AND e.Application_Id IN (SELECT LOWER(ApplicationId) FROM dashboard.Chat_Dim_Events);
 
 --MenuItem tap on Messages
 DROP TABLE IF EXISTS dashboard.Chat_Fact_MenuTapMessages;
 CREATE TABLE dashboard.Chat_Fact_MenuTapMessages AS
 SELECT 
-e.ApplicationId,
+UPPER(e.Application_Id) AS ApplicationId,
 e.Created,
 iu.UserId AS UserId
-FROM Report.NewMetrics_Actions_MenuItem e
-JOIN AuthDB_IS_Users iu ON e.ApplicationId = iu.ApplicationId AND e.GlobalUserId = iu.GlobalUserId
-WHERE Tapped IN ('Menu - Messages')
-AND e.ApplicationId IN (SELECT ApplicationId FROM dashboard.Chat_Dim_Events);
+FROM dashboard.kpi_chat_action_metrics e
+JOIN AuthDB_IS_Users iu ON e.Application_Id = LOWER(iu.ApplicationId) AND e.Global_User_Id = LOWER(iu.GlobalUserId)
+WHERE Identifier = 'menuItem'
+AND e.Application_Id IN (SELECT LOWER(ApplicationId) FROM dashboard.Chat_Dim_Events);
 
 --Chat Views
 DROP TABLE IF EXISTS dashboard.Chat_Fact_Views;
@@ -84,7 +85,7 @@ e.Created,
 iu.UserId,
 CASE WHEN LENGTH(CAST(e.Metadata ->> 'ChannelId' AS TEXT)) > 9 THEN NULL ELSE CAST(e.Metadata ->> 'ChannelId' AS INT) END AS ChannelId,
 CASE WHEN LENGTH(CAST(e.Metadata ->> 'ChannelId' AS TEXT)) > 9 THEN 1 ELSE 0 END AS ChannelId_Bug
-FROM PUBLIC.Fact_Views_Live e
+FROM dashboard.kpi_chat_view_metrics e
 JOIN PUBLIC.AuthDB_IS_Users iu ON UPPER(e.Application_ID) = iu.ApplicationId AND UPPER(e.Global_User_Id) = iu.GlobalUserId
 WHERE e.Identifier = 'chat';
 
@@ -92,13 +93,13 @@ WHERE e.Identifier = 'chat';
 DROP TABLE IF EXISTS dashboard.Chat_Fact_Blocks;
 CREATE TABLE dashboard.Chat_Fact_Blocks AS
 SELECT
-e.ApplicationId,
+UPPER(e.Application_Id) AS ApplicationId,
 e.Created,
 iu.UserId AS UserId
-FROM report.NewMetrics_Actions_Chat e
-JOIN AuthDB_IS_Users iu ON e.ApplicationId = iu.ApplicationId AND e.GlobalUserId = iu.GlobalUserId
-WHERE e.Tapped = 'Chat (mute)'
-AND e.ApplicationId IN (SELECT ApplicationId FROM dashboard.Chat_Dim_Events);
+FROM dashboard.kpi_chat_action_metrics e
+JOIN AuthDB_IS_Users iu ON e.Application_Id = LOWER(iu.ApplicationId) AND e.Global_User_Id = LOWER(iu.GlobalUserId)
+WHERE Identifier = 'chatProfileButton'
+AND e.Application_Id IN (SELECT LOWER(ApplicationId) FROM dashboard.Chat_Dim_Events);
 
 --====================================================================================================
 
@@ -118,7 +119,7 @@ SELECT
   END AS RoomType
 FROM (SELECT DISTINCT ApplicationId, ChannelId, DD_Ind FROM dashboard.Chat_Dim_Rooms WHERE Type = 'GROUP') rm --Base set of Rooms
 --Identify how many messages were sent and how many users sent messages in each room
-LEFT JOIN (SELECT ChannelId, COUNT(*) AS Messages, COUNT(DISTINCT S_UserId) AS Messagers FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0 GROUP BY 1) agg ON rm.ChannelId = agg.ChannelId
+LEFT JOIN (SELECT Channel_Id, COUNT(*) AS Messages, COUNT(DISTINCT S_UserId) AS Messagers FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0 GROUP BY 1) agg ON rm.ChannelId = agg.Channel_Id
 ORDER BY 1,2,3;
 
 --====================================================================================================
@@ -129,13 +130,13 @@ CREATE TABLE dashboard.Chat_Agg_RoomView AS
 SELECT ChannelId, UserId, MAX(Created) AS LatestViewTS FROM (
 SELECT ChannelId, UserId, Created FROM dashboard.Chat_Fact_Views WHERE ChannelId_Bug = 0
 UNION ALL 
-SELECT ChannelId, S_UserId AS UserId, Created FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0) t GROUP BY 1,2;
+SELECT Channel_Id, S_UserId AS UserId, Created FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0) t GROUP BY 1,2;
 
 --Aggregate: latest sendMessage per room per user
 DROP TABLE IF EXISTS dashboard.Chat_Agg_SendMessage;
 CREATE TABLE dashboard.Chat_Agg_SendMessage AS
-SELECT ChannelId, UserId, MAX(Created) AS LatestSendMessageTS FROM (
-SELECT ChannelId, S_UserId AS UserId, Created FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0) t GROUP BY 1,2;
+SELECT Channel_Id, UserId, MAX(Created) AS LatestSendMessageTS FROM (
+SELECT Channel_Id, S_UserId AS UserId, Created FROM dashboard.Chat_Fact_MessagesSent WHERE MessageSent_Bug = 0) t GROUP BY 1,2;
 
 --====================================================================================================
 
@@ -167,7 +168,7 @@ DROP TABLE IF EXISTS dashboard.Chat_Fact_MessagesFlagged;
 CREATE TABLE dashboard.Chat_Fact_MessagesFlagged AS
 SELECT
   ms.ApplicationId,
-  ms.ChannelId, 
+  ms.Channel_Id, 
   ms.S_UserId, 
   ms.R_UserId, 
   ms.Created AS MessageSentTS, 
@@ -176,11 +177,11 @@ SELECT
   CASE WHEN v.LatestViewTS IS NOT NULL AND v.LatestViewTS >= ms.Created THEN 1 ELSE 0 END AS MessageViewed_Ind,
   CASE WHEN sm.LatestSendMessageTS IS NOT NULL AND sm.LatestSendMessageTS >= ms.Created THEN 1 ELSE 0 END AS MessageReplied_Ind
 FROM dashboard.Chat_Fact_MessagesSent ms
-LEFT JOIN dashboard.Chat_Agg_RoomView v ON ms.ChannelId = v.ChannelId AND ms.S_UserId <> v.UserId 
-LEFT JOIN dashboard.Chat_Agg_SendMessage sm ON ms.ChannelId = sm.ChannelId AND ms.S_UserId <> sm.UserId
+LEFT JOIN dashboard.Chat_Agg_RoomView v ON ms.Channel_Id = v.ChannelId AND ms.R_UserId = v.UserId 
+LEFT JOIN dashboard.Chat_Agg_SendMessage sm ON ms.Channel_Id = sm.Channel_Id AND ms.R_UserId = sm.UserId
 WHERE ms.MessageSent_Bug = 0
-AND ms.ChannelId IN (SELECT ChannelId FROM dashboard.Chat_Dim_Rooms WHERE DD_INd = 0 AND Type = 'GROUP') --Filter out rooms with any DD users
-ORDER BY ms.ApplicationId, ms.ChannelId, ms.Created;
+AND ms.Channel_Id IN (SELECT ChannelId FROM dashboard.Chat_Dim_Rooms WHERE DD_INd = 0 AND Type = 'GROUP') --Filter out rooms with any DD users
+ORDER BY ms.ApplicationId, ms.Channel_Id, ms.Created;
 
 --====================================================================================================
 
@@ -191,7 +192,7 @@ SELECT
   base.ApplicationId AS "ApplicationId", 
   app.Name AS "Event",
   rm.CNT AS "Total Rooms",
-  ROUND(100 * CAST(COUNT(DISTINCT ChannelId) AS NUMERIC) / CAST(rm.CNT AS NUMERIC),2) AS "% Rooms with any Messages",
+  ROUND(100 * CAST(COUNT(DISTINCT Channel_Id) AS NUMERIC) / CAST(rm.CNT AS NUMERIC),2) AS "% Rooms with any Messages",
   ROUND(100 * CAST(rm_2conv.CNT AS NUMERIC) / CAST(rm.CNT AS NUMERIC),2) AS "% Rooms with 2-way Conversation",
   ROUND(100 * CAST(rm_1conv.CNT AS NUMERIC) / CAST(rm.CNT AS NUMERIC),2) AS "% Rooms with 1-way Conversation",
   ROUND(100 * CAST(rm_0conv.CNT AS NUMERIC) / CAST(rm.CNT AS NUMERIC),2) AS "% Rooms with no Conversation",
@@ -199,7 +200,7 @@ SELECT
   ROUND(100 * CAST(SUM(MessageViewed_Ind) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC),2) AS "% Messages followed by View from Recipient",
   ROUND(100 * CAST(SUM(MessageReplied_Ind) AS NUMERIC) / CAST(COUNT(*) AS NUMERIC),2) AS "% Messages followed by Reply Sent",
   
-  COUNT(DISTINCT ChannelId) AS "Rooms - with any Messages", 
+  COUNT(DISTINCT Channel_Id) AS "Rooms - with any Messages", 
   rm_2conv.CNT AS "Rooms - with 2-way Conversation", 
   rm_1conv.CNT AS "Rooms - with 1-way Conversation", 
   rm_0conv.CNT AS "Rooms - with no Conversation", 
