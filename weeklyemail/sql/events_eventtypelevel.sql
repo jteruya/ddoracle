@@ -6,7 +6,7 @@ select
    'Week of ' || spine.week_starting "name",
    'Week of ' || spine.week_starting id,
     spine.eventtype,
-    count(*) y
+    count(case when events.eventtype is not null then 1 else null end) y
 from (select week.week_starting
            , eventtype.eventtype  
       from (select distinct week_starting from dashboard.weekly_adoption_events) week
