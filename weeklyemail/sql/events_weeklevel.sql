@@ -29,6 +29,5 @@ select
    week_starting as "Week Of",
    count(*) as "Event Count"
 from dashboard.weekly_adoption_events
-where openevent = 0
 group by 1
 order by 1;
