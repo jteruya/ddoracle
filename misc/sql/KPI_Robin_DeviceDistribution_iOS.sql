@@ -22,6 +22,8 @@ CASE
   WHEN mi.MMM_Info = 'iPad2,5' THEN 'iPad mini'
   WHEN mi.MMM_Info IN ('iPad2,2','iPad2,1') THEN 'iPad 2'
   WHEN mi.MMM_Info = 'iPhone8,4' THEN 'iPhone SE'
+  WHEN mi.MMM_Info IN ('iPhone9,1', 'iPhone9,3') THEN 'iPhone 7'
+  WHEN mi.MMM_Info IN ('iPhone9,2', 'iPhone9,4') THEN 'iPhone 7 Plus'
   ELSE '(untranslated) - ' || REPLACE(mi.MMM_Info,',','-')
 END AS MMM_Info,
 months.YYYY_MM,
