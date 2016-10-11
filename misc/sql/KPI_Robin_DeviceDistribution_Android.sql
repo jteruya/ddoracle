@@ -33,6 +33,7 @@ CASE
   WHEN mi.MMM_Info LIKE 'klt%,samsung' THEN 'Samsung Galaxy S5'
   WHEN mi.MMM_Info LIKE '%SM%G920%samsung' THEN 'Samsung Galaxy S6'
   WHEN mi.MMM_Info LIKE '%SM%G925%samsung' THEN 'Samsung Galaxy S6 Edge'
+  WHEN mi.MMM_Info LIKE '%SM%G928V%samsung' THEN 'Samsung Galaxy S6 Edge Plus'
   WHEN mi.MMM_Info LIKE '%SM%G930%samsung' THEN 'Samsung Galaxy S7'
   WHEN mi.MMM_Info LIKE '%SM%G935%samsung' THEN 'Samsung Galaxy S7 Edge'  
   WHEN mi.MMM_Info = 'serranoltexx,GT-I9195,samsung' THEN 'Samsung Galaxy S4 Mini'
@@ -45,7 +46,6 @@ CASE
   WHEN mi.MMM_Info LIKE '%A0001%OnePlus%' THEN 'OnePlus'
   WHEN mi.MMM_Info LIKE '%Nexus 6%' THEN 'Nexus 6'
   WHEN mi.MMM_Info LIKE '%Nexus 5X%' THEN 'Nexus 5X'
-
   ELSE '(untranslated) - ' || REPLACE(mi.MMM_Info,',','-')
 END AS MMM_Info,
 months.YYYY_MM,
