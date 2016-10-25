@@ -45,7 +45,7 @@ insert into dashboard.kpi_login_checkpoint_metrics (
 	from (select *
 	           , fn_parent_binaryversion(binary_version) as binary_version_new
 	      from fact_checkpoints_live
-	      where identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess')
+	      where identifier in ('loginFlowStart', 'accountPickerLoginSuccess', 'enterEmailLoginSuccess', 'enterPasswordLoginSuccess', 'eventPickerLoginSuccess','profileFillerLoginSuccess','webLoginSuccess', 'eventProfileChoiceSuccess', 'passwordForkLoginSuccess', 'autoLoginSuccess', 'enterEmailLoginError')
 	      and binary_version >= '6'
 	      and created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '5' month
 	      and created::date <= current_date) a
@@ -80,7 +80,7 @@ insert into dashboard.kpi_login_view_metrics (
 	from (select *
 	           , fn_parent_binaryversion(binary_version) as binary_version_new
 	      from fact_views_live
-	      where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice')
+	      where identifier in ('accountPicker','enterEmail','enterPassword','remoteSsoLogin','resetPassword','eventPicker','profileFiller','eventProfileChoice', 'passwordFork', 'emailLoginSent')
 	      and binary_version >= '6'
 	      and created::date >= current_date - (cast(extract(day from current_date) as int) - 1) - interval '5' month
 	      and created::date <= current_date) a
